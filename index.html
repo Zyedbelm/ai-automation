@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatisation IA | Baptiste Zyed MEDDEB</title>
+    <meta name="description" content="Expert en automatisation des processus métier avec l'IA. Make certifié niveau 5, 12+ ans d'expérience entrepreneuriale en Suisse.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --accent: #f59e0b;
+            --success: #059669;
+            --white: #ffffff;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-900: #0f172a;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--gray-900);
+            background: var(--white);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--gray-100);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: 'Fraunces', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-cta {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-cta:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 0 4rem;
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') center/cover;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-text h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: var(--gray-900);
+        }
+
+        .hero-text .highlight {
+            color: var(--primary);
+        }
+
+        .hero-text p {
+            font-size: 1.25rem;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .hero-image {
+            position: relative;
+        }
+
+        .hero-image img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .credentials {
+            display: flex;
+            gap: 2rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .credential {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .credential .icon {
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+        }
+
+        /* Calculator Section */
+        .calculator-section {
+            padding: 6rem 0;
+            background: var(--white);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--gray-900);
+        }
+
+        .section-header p {
+            font-size: 1.25rem;
+            color: var(--secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .calculator-card {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: var(--shadow);
+            max-width: 700px;
+            margin: 0 auto;
+            border: 1px solid var(--gray-100);
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 1rem;
+            border: 2px solid var(--gray-100);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .calculator-result {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .result-main {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .result-details {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .email-capture {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .email-form {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .email-form input {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--gray-900);
+        }
+
+        .email-form button {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .email-form button:hover {
+            background: var(--gray-100);
+        }
+
+        /* Services Section */
+        .services-section {
+            padding: 6rem 0;
+            background: var(--gray-50);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .service-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Styles distincts pour chaque carte */
+        .service-card:nth-child(1) {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.08);
+        }
+
+        .service-card:nth-child(1):hover {
+            transform: translateY(-8px) rotate(1deg);
+            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.15);
+        }
+
+        .service-card:nth-child(2) {
+            background: linear-gradient(145deg, #60a5fa, #3b82f6);
+            color: white;
+            border: 2px solid #2563eb;
+            box-shadow: 0 15px 35px rgba(96, 165, 250, 0.3);
+        }
+
+        .service-card:nth-child(2) h3,
+        .service-card:nth-child(2) .service-features {
+            color: white;
+        }
+
+        .service-card:nth-child(2) .service-price {
+            color: #fef3c7;
+        }
+
+        .service-card:nth-child(2):hover {
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 0 25px 50px rgba(96, 165, 250, 0.4);
+        }
+
+        .service-card:nth-child(3) {
+            background: linear-gradient(145deg, #f59e0b, #d97706);
+            color: white;
+            border: 2px solid #b45309;
+            box-shadow: 0 12px 30px rgba(245, 158, 11, 0.25);
+        }
+
+        .service-card:nth-child(3) h3,
+        .service-card:nth-child(3) .service-features {
+            color: white;
+        }
+
+        .service-card:nth-child(3) .service-price {
+            color: #fef3c7;
+        }
+
+        .service-card:nth-child(3):hover {
+            transform: translateY(-10px) rotate(-1deg);
+            box-shadow: 0 20px 45px rgba(245, 158, 11, 0.35);
+        }
+
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+
+        .service-card.featured {
+            transform: scale(1.05);
+        }
+
+        .service-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--gray-900);
+        }
+
+        .service-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+
+        .service-price .original {
+            font-size: 1.5rem;
+            text-decoration: line-through;
+            color: var(--secondary);
+            margin-right: 0.5rem;
+        }
+
+        .service-features {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .service-features li {
+            padding: 0.5rem 0;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .service-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 6rem 0;
+            background: white;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-image {
+            position: relative;
+        }
+
+        .about-image img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .about-text h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--gray-900);
+        }
+
+        .about-text .role {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-text p {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 6rem 0;
+            background: var(--gray-50);
+        }
+
+        .contact-form {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-info {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--gray-100);
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Messages */
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+            text-align: center;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--gray-900);
+            color: white;
+            padding: 3rem 0 1rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            color: #94a3b8;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            padding-top: 2rem;
+            text-align: center;
+            color: #94a3b8;
+        }
+
+        /* Floating CTA */
+        .floating-cta {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .floating-cta:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .email-form {
+                flex-direction: column;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .service-card.featured {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo">BZM</a>
+            <ul class="nav-links">
+                <li><a href="#calculator">Calculateur</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#about">À propos</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <a href="https://calendar.app.google/vaCEdgHuR2Ffdrp3A" class="nav-cta" target="_blank">Réserver un appel</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Automatisez vos processus avec <span class="highlight">l'Intelligence Artificielle</span></h1>
+                    <p>Manager débordé ? Automatisez vos processus répétitifs et récupérez des heures précieuses pour diriger et vous concentrer sur l'essentiel de votre métier.</p>
+                    <p>Je suis Expert Make certifié niveau 5 - Basé en Suisse, Valais.</p>
+                    <div class="hero-cta">
+                        <a href="#calculator" class="btn btn-primary">Calculer mes économies</a>
+                        <a href="https://calendar.app.google/vaCEdgHuR2Ffdrp3A" class="btn btn-secondary" target="_blank">Audit gratuit</a>
+                    </div>
+                    <div class="credentials">
+                        <div class="credential">
+                            <span class="icon">★</span>
+                            <span>Make Expert Niveau 5</span>
+                        </div>
+                        <div class="credential">
+                            <span class="icon">🚀</span>
+                            <span>3x Entrepreneur</span>
+                        </div>
+                        <div class="credential">
+                            <span class="icon">📅</span>
+                            <span>12+ ans d'expérience</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Automatisation et Intelligence Artificielle" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculator Section -->
+    <section class="calculator-section" id="calculator">
+        <div class="container">
+            <div class="section-header">
+                <h2>Calculateur de Temps Économisé</h2>
+                <p>Découvrez combien d'heures vous pourriez récupérer chaque semaine grâce à l'automatisation</p>
+            </div>
+            
+            <div class="calculator-card">
+                <form id="calculatorForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="employees">Nombre d'employés</label>
+                            <select id="employees" required>
+                                <option value="">Sélectionnez...</option>
+                                <option value="1-5">1-5 employés</option>
+                                <option value="6-15">6-15 employés</option>
+                                <option value="16-50">16-50 employés</option>
+                                <option value="50+">Plus de 50 employés</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="emails">Emails traités par jour</label>
+                            <input type="number" id="emails" placeholder="Ex: 50" min="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="documents">Documents rédigés par semaine</label>
+                            <input type="number" id="documents" placeholder="Ex: 10" min="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="processes">Principal processus répétitif</label>
+                            <select id="processes" required>
+                                <option value="">Sélectionnez...</option>
+                                <option value="facturation">Facturation</option>
+                                <option value="rh">Gestion RH</option>
+                                <option value="commercial">Suivi commercial</option>
+                                <option value="reporting">Reporting</option>
+                                <option value="maintenance">Maintenance</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        Calculer mes économies
+                        <span class="loading" id="calcLoading"></span>
+                    </button>
+                </form>
+                
+                <div class="calculator-result" id="calculatorResult">
+                    <div class="result-main" id="resultHours">0</div>
+                    <div class="result-label">heures économisées par semaine</div>
+                    <div class="result-details">
+                        <p><strong>Équivalent mensuel :</strong></p>
+                        <p id="resultEquivalent">0 journées de travail</p>
+                        <p id="resultValue">0 CHF économisés</p>
+                    </div>
+                    
+                    <div class="email-capture" id="emailCapture">
+                        <h3>Recevez votre plan d'action personnalisé</h3>
+                        <p>+ Les slides de ma formation CVPS sur l'automatisation IA</p>
+                        <form class="email-form" id="emailForm">
+                            <input type="email" placeholder="Votre email professionnel" required id="emailInput">
+                            <button type="submit">
+                                Recevoir maintenant
+                                <span class="loading" id="emailLoading"></span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="message success" id="successMessage">
+                    Email envoyé ! Vérifiez votre boîte de réception.
+                </div>
+                <div class="message error" id="errorMessage">
+                    Une erreur s'est produite. Contactez-moi directement.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services-section" id="services">
+        <div class="container">
+            <div class="section-header">
+                <h2>Mes Services d'Automatisation</h2>
+                <p>Du simple au complexe, choisissez l'accompagnement qui correspond à vos besoins</p>
+            </div>
+            
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-badge">Nouveau client</div>
+                    <h3>Audit Personnalisé</h3>
+                    <div class="service-price">
+                        <span class="original">800</span>500 CHF
+                    </div>
+                    <ul class="service-features">
+                        <li>Analyse complète de vos processus</li>
+                        <li>Plan d'action prioritaire</li>
+                        <li>Estimation ROI détaillée</li>
+                        <li>2h de consultation</li>
+                        <li>Rapport livré sous 48h</li>
+                    </ul>
+                    <a href="mailto:baptiste.e.1985@gmail.com?subject=Demande%20d'Audit%20Personnalisé%20-%20500%20CHF&body=Bonjour%20Baptiste,%0A%0AJe%20suis%20intéressé(e)%20par%20votre%20service%20d'Audit%20Personnalisé%20à%20500%20CHF.%0A%0AMon%20entreprise%20:%20[Nom%20de%20votre%20entreprise]%0AMon%20secteur%20d'activité%20:%20[Votre%20secteur]%0ANombre%20d'employés%20:%20[Nombre]%0A%0AProcessus%20que%20j'aimerais%20automatiser%20:%0A-%20[Décrire%20vos%20processus%20répétitifs]%0A-%20[Autre%20processus]%0A%0AObjectifs%20:%0A-%20Économiser%20du%20temps%20sur%20les%20tâches%20manuelles%0A-%20Améliorer%20l'efficacité%20opérationnelle%0A-%20[Autres%20objectifs]%0A%0AQuand%20pourriez-vous%20programmer%20les%202h%20de%20consultation%20?%0A%0ACordialement," class="btn btn-primary" style="width: 100%; text-align: center;">Réserver l'audit</a>
+                </div>
+                
+                <div class="service-card featured">
+                    <div class="service-badge">Populaire</div>
+                    <h3>Programme Quick Win</h3>
+                    <div class="service-price">
+                        <span class="original">1800</span>1200 CHF
+                    </div>
+                    <ul class="service-features">
+                        <li>Audit initial inclus</li>
+                        <li>Automatisation d'1 processus critique</li>
+                        <li>3 sessions de mise en place</li>
+                        <li>Templates prêts à l'emploi</li>
+                        <li>Support 1 mois</li>
+                        <li>Formation équipe</li>
+                    </ul>
+                    <a href="mailto:baptiste.e.1985@gmail.com?subject=Programme%20Quick%20Win%20-%201200%20CHF&body=Bonjour%20Baptiste,%0A%0AJe%20souhaite%20démarrer%20le%20Programme%20Quick%20Win%20à%201200%20CHF.%0A%0AMon%20entreprise%20:%20[Nom%20de%20votre%20entreprise]%0ASecteur%20:%20[Votre%20secteur]%0AÉquipe%20:%20[Nombre%20d'employés]%0A%0AProcessus%20critique%20à%20automatiser%20en%20priorité%20:%0A[Décrire%20le%20processus%20qui%20vous%20fait%20perdre%20le%20plus%20de%20temps]%0A%0AProblèmes%20actuels%20:%0A-%20Tâches%20répétitives%20chronophages%0A-%20Erreurs%20manuelles%20fréquentes%0A-%20[Autres%20défis]%0A%0ARésultats%20attendus%20:%0A-%20Économie%20de%20temps%20hebdomadaire%0A-%20Réduction%20des%20erreurs%0A-%20Amélioration%20de%20la%20productivité%0A%0AQuand%20pouvons-nous%20commencer%20?%0A%0ACordialement," class="btn" style="width: 100%; text-align: center; background: white; color: #3b82f6; border: 2px solid white; font-weight: 600;">Commencer maintenant</a>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-badge">Premium</div>
+                    <h3>Transformation Complète</h3>
+                    <div class="service-price">
+                        <span class="original">4000</span>2500 CHF
+                    </div>
+                    <ul class="service-features">
+                        <li>Programme Quick Win inclus</li>
+                        <li>Automatisation de 3-5 processus</li>
+                        <li>Intégration écosystème complet</li>
+                        <li>IA personnalisée</li>
+                        <li>Support 6 mois</li>
+                        <li>Accès formations futures</li>
+                    </ul>
+                    <a href="mailto:baptiste.e.1985@gmail.com?subject=Transformation%20Complète%20VIP%20-%202500%20CHF&body=Bonjour%20Baptiste,%0A%0AJe%20veux%20lancer%20la%20Transformation%20Complète%20de%20mon%20entreprise%20à%202500%20CHF.%0A%0AMon%20entreprise%20:%20[Nom%20de%20votre%20entreprise]%0ASecteur%20:%20[Votre%20secteur]%0ATaille%20:%20[Nombre%20d'employés]%0AChiffre%20d'affaires%20annuel%20:%20[Estimation]%0A%0AProcessus%20à%20automatiser%20(3-5%20processus)%20:%0A1.%20[Premier%20processus%20-%20ex:%20facturation]%0A2.%20[Deuxième%20processus%20-%20ex:%20gestion%20client]%0A3.%20[Troisième%20processus%20-%20ex:%20reporting]%0A4.%20[Quatrième%20processus%20-%20ex:%20RH]%0A5.%20[Cinquième%20processus%20-%20ex:%20marketing]%0A%0AOutils%20actuels%20:%0A-%20[CRM%20utilisé]%0A-%20[Outils%20comptables]%0A-%20[Autres%20logiciels]%0A%0AObjectifs%20ambitieux%20:%0A-%20Économiser%2010+%20heures/semaine%0A-%20Intégration%20complète%20de%20l'écosystème%0A-%20IA%20personnalisée%20pour%20mon%20secteur%0A-%20ROI%20mesurable%20sous%206%20mois%0A%0AQuand%20pouvons-nous%20démarrer%20cette%20transformation%20?%0A%0ACordialement," class="btn btn-primary" style="width: 100%; text-align: center;">Transformation VIP</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-image">
+                    <img src="https://creatorspace.imgix.net/users/cle5w645j01mco20yp5z6hu0t/IrUZ3O3bnaNA88Yg-3-BW.png?w=300&h=300" alt="Baptiste Zyed MEDDEB" style="border-radius: 50%; width: 300px; height: 300px; object-fit: cover;" />
+                </div>
+                <div class="about-text">
+                    <h2>Baptiste Zyed MEDDEB</h2>
+                    <div class="role">Expert Automatisation IA & Entrepreneur Serial</div>
+                    <p>Basé en Suisse (Valais), je suis un entrepreneur expérimenté avec 12+ années dans l'écosystème startup et business. Après avoir créé 3 entreprises (dont 1 exit réussi), je me suis spécialisé dans l'automatisation intelligente des processus métier.</p>
+                    <p><strong>Ma mission :</strong> Libérer les entrepreneurs des tâches répétitives pour qu'ils puissent se concentrer sur ce qui compte vraiment - développer leur business et créer de la valeur.</p>
+                    <p>Expert Make certifié niveau 5 (le plus haut niveau), je maîtrise l'écosystème complet de l'automatisation : IA, no-code, intégrations API, workflows complexes.</p>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number">12+</span>
+                            <span class="stat-label">Années d'expérience</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">3</span>
+                            <span class="stat-label">Entreprises créées</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">Niv. 5</span>
+                            <span class="stat-label">Certification Make</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">1</span>
+                            <span class="stat-label">Exit réussi</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 2rem;">
+                        <a href="tel:+41793017915" class="btn btn-secondary" style="margin-right: 1rem;">+41 79 301 79 15</a>
+                        <a href="https://calendar.app.google/vaCEdgHuR2Ffdrp3A" class="btn btn-primary" target="_blank">Réserver un appel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2>Prêt à automatiser votre entreprise ?</h2>
+                <p>Contactez-moi pour discuter de votre projet d'automatisation</p>
+            </div>
+            
+            <div class="contact-form">
+                <form id="contactForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name">Nom et Prénom *</label>
+                            <input type="text" id="name" name="name" required placeholder="Votre nom complet">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email_contact">Email professionnel *</label>
+                            <input type="email" id="email_contact" name="email" required placeholder="votre@email.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="company">Entreprise</label>
+                            <input type="text" id="company" name="company" placeholder="Nom de votre entreprise">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="service">Service qui vous intéresse *</label>
+                            <select id="service" name="service" required>
+                                <option value="">Sélectionnez...</option>
+                                <option value="audit">Audit Personnalisé (500 CHF)</option>
+                                <option value="quickwin">Programme Quick Win (1200 CHF)</option>
+                                <option value="transformation">Transformation Complète (2500 CHF)</option>
+                                <option value="question">J'ai une question / Autre</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Décrivez brièvement vos besoins *</label>
+                            <textarea id="message" name="message" rows="4" required placeholder="Quels processus aimeriez-vous automatiser ? Quels sont vos principaux défis ?"></textarea>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        Envoyer ma demande
+                        <span class="loading" id="contactLoading"></span>
+                    </button>
+                </form>
+                
+                <div class="message success" id="contactSuccess">
+                    Message envoyé ! Je vous recontacte dans les 24h.
+                </div>
+                
+                <div class="message error" id="contactError">
+                    Erreur lors de l'envoi. Contactez-moi directement.
+                </div>
+                
+                <div class="contact-info">
+                    <p>Ou contactez-moi directement :</p>
+                    <div class="contact-links">
+                        <a href="tel:+41793017915">+41 79 301 79 15</a>
+                        <a href="mailto:baptiste.e.1985@gmail.com">baptiste.e.1985@gmail.com</a>
+                    </div>
+                    <p style="margin-top: 1rem; color: var(--secondary);">Route du Manège 60, 1950 Sion</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Baptiste Zyed MEDDEB</h3>
+                    <p>Expert en automatisation des processus métier avec l'Intelligence Artificielle. Basé en Suisse.</p>
+                    <a href="https://bento.me/bzmeddeb" target="_blank">Mon profil complet</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Services</h3>
+                    <a href="#services">Audit Personnalisé</a>
+                    <a href="#services">Programme Quick Win</a>
+                    <a href="#services">Transformation Complète</a>
+                    <a href="https://calendar.app.google/vaCEdgHuR2Ffdrp3A" target="_blank">Consultation Gratuite</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Solutions</h3>
+                    <a href="#calculator">Calculateur d'économies</a>
+                    <p>Rédaction automatique</p>
+                    <p>Gestion des emails</p>
+                    <p>Workflows automatisés</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <a href="tel:+41793017915">+41 79 301 79 15</a>
+                    <a href="mailto:baptiste.e.1985@gmail.com">baptiste.e.1985@gmail.com</a>
+                    <p>Route du Manège 60, 1950 Sion</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Baptiste Zyed MEDDEB - Expert Automatisation IA. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating CTA -->
+    <a href="https://calendar.app.google/vaCEdgHuR2Ffdrp3A" class="floating-cta" target="_blank">
+        Réserver un appel
+    </a>
+
+    <script>
+        // Configuration Supabase
+        const SUPABASE_URL = 'https://geeiwhtiwwwlmsemabfl.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdlZWl3aHRpd3d3bG1zZW1hYmZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MDAzNTEsImV4cCI6MjA3MzE3NjM1MX0.MgoCbNtSS-IumVyyozFE9kDsqHYwiZC5M8egpAq6Yic';
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Session ID pour analytics
+        const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+        // Smooth scrolling pour les liens internes
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Fonctions utilitaires
+        function showLoading(elementId, show = true) {
+            const loading = document.getElementById(elementId);
+            if (loading) {
+                loading.style.display = show ? 'inline-block' : 'none';
+            }
+        }
+
+        function showMessage(elementId, show = true) {
+            const message = document.getElementById(elementId);
+            if (message) {
+                if (show) {
+                    message.classList.add('show');
+                    setTimeout(() => message.classList.remove('show'), 5000);
+                } else {
+                    message.classList.remove('show');
+                }
+            }
+        }
+
+        async function trackEvent(eventType, eventData = {}) {
+            try {
+                await supabase.from('page_analytics').insert({
+                    session_id: sessionId,
+                    page_path: window.location.pathname,
+                    event_type: eventType,
+                    event_data: eventData,
+                    ip_address: null, // Sera ajouté côté serveur
+                    user_agent: navigator.userAgent,
+                    referrer: document.referrer,
+                    utm_source: new URLSearchParams(window.location.search).get('utm_source'),
+                    utm_medium: new URLSearchParams(window.location.search).get('utm_medium'),
+                    utm_campaign: new URLSearchParams(window.location.search).get('utm_campaign')
+                });
+            } catch (error) {
+                console.log('Analytics tracking failed:', error.message);
+            }
+        }
+
+        // Calculateur
+        document.getElementById('calculatorForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const button = e.target.querySelector('button[type="submit"]');
+            button.disabled = true;
+            showLoading('calcLoading', true);
+            
+            try {
+                const employees = document.getElementById('employees').value;
+                const emails = parseInt(document.getElementById('emails').value);
+                const documents = parseInt(document.getElementById('documents').value);
+                const processes = document.getElementById('processes').value;
+                
+                // Algorithme de calcul
+                let timeSaved = 0;
+                
+                // Temps économisé sur les emails (2 min par email, 70% automatisable)
+                timeSaved += (emails * 2 * 5 * 0.7) / 60;
+                
+                // Temps économisé sur les documents (30 min par document, 60% automatisable)
+                timeSaved += (documents * 30 * 0.6) / 60;
+                
+                // Multiplicateur selon le type de processus
+                const processMultipliers = {
+                    'facturation': 8,
+                    'rh': 12,
+                    'commercial': 6,
+                    'reporting': 10,
+                    'maintenance': 4
+                };
+                timeSaved += processMultipliers[processes] || 5;
+                
+                // Multiplicateur selon la taille d'entreprise
+                const employeeMultipliers = {
+                    '1-5': 1,
+                    '6-15': 1.5,
+                    '16-50': 2.5,
+                    '50+': 4
+                };
+                timeSaved *= employeeMultipliers[employees] || 1;
+                
+                // Arrondir
+                timeSaved = Math.round(timeSaved);
+                
+                // Calculs financiers
+                const monthlyValue = Math.round(timeSaved * 4.33 * 80);
+                const dailyEquivalent = Math.round(timeSaved / 8 * 4.33 * 10) / 10;
+                
+                // Stocker les résultats
+                window.calculatorResults = {
+                    employees,
+                    emails_per_day: emails,
+                    documents_per_week: documents,
+                    process_type: processes,
+                    time_saved: timeSaved,
+                    monthly_value: monthlyValue,
+                    daily_equivalent: dailyEquivalent
+                };
+                
+                // Afficher les résultats
+                document.getElementById('resultHours').textContent = timeSaved;
+                document.getElementById('resultEquivalent').textContent = `${dailyEquivalent} journées de travail`;
+                document.getElementById('resultValue').textContent = `${monthlyValue.toLocaleString()} CHF économisés`;
+                
+                // Montrer les résultats
+                document.getElementById('calculatorResult').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('emailCapture').style.display = 'block';
+                }, 1000);
+                
+                // Scroll vers les résultats
+                document.getElementById('calculatorResult').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                
+                // Track événement
+                trackEvent('calculator_completed', window.calculatorResults);
+                
+            } catch (error) {
+                console.error('Erreur calculateur:', error);
+                showMessage('errorMessage');
+            } finally {
+                button.disabled = false;
+                showLoading('calcLoading', false);
+            }
+        });
+
+        // Capture d'email
+        document.getElementById('emailForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const button = e.target.querySelector('button[type="submit"]');
+            const email = document.getElementById('emailInput').value;
+            
+            button.disabled = true;
+            showLoading('emailLoading', true);
+            
+            try {
+                // Sauvegarder en base
+                const { data, error } = await supabase
+                    .from('calculator_leads')
+                    .insert({
+                        email,
+                        ...window.calculatorResults,
+                        source: 'calculator'
+                    })
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                // Appeler la fonction edge pour envoyer l'email
+                const emailResponse = await fetch(`${SUPABASE_URL}/functions/v1/handle-calculator`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email,
+                        ...window.calculatorResults,
+                        language: 'fr'
+                    })
+                });
+
+                if (emailResponse.ok) {
+                    // Marquer l'email comme envoyé
+                    await supabase
+                        .from('calculator_leads')
+                        .update({ email_sent: true })
+                        .eq('id', data.id);
+                }
+
+                // Cacher la capture et montrer le succès
+                document.getElementById('emailCapture').style.display = 'none';
+                showMessage('successMessage');
+
+                // Track conversion
+                trackEvent('email_captured', { email, lead_id: data.id });
+
+            } catch (error) {
+                console.error('Erreur capture email:', error);
+                showMessage('errorMessage');
+            } finally {
+                button.disabled = false;
+                showLoading('emailLoading', false);
+            }
+        });
+
+        // Formulaire de contact
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const button = e.target.querySelector('button[type="submit"]');
+            button.disabled = true;
+            showLoading('contactLoading', true);
+            
+            try {
+                const formData = new FormData(e.target);
+                const contactData = Object.fromEntries(formData);
+                
+                // Sauvegarder en base
+                const { data, error } = await supabase
+                    .from('contact_requests')
+                    .insert({
+                        ...contactData,
+                        status: 'new',
+                        priority: contactData.service === 'transformation' ? 3 : contactData.service === 'quickwin' ? 2 : 1
+                    })
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                // Appeler la fonction edge pour envoyer les emails
+                const emailResponse = await fetch(`${SUPABASE_URL}/functions/v1/handle-contact`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(contactData)
+                });
+
+                // Afficher le succès même si l'email échoue
+                showMessage('contactSuccess');
+                e.target.reset();
+
+                // Track conversion
+                trackEvent('contact_form_submitted', { contact_id: data.id, service: contactData.service });
+
+            } catch (error) {
+                console.error('Erreur formulaire contact:', error);
+                showMessage('contactError');
+            } finally {
+                button.disabled = false;
+                showLoading('contactLoading', false);
+            }
+        });
+
+        // Track page view
+        trackEvent('page_view', {
+            page: window.location.pathname,
+            referrer: document.referrer
+        });
+
+        // Track scroll depth
+        let maxScrollDepth = 0;
+        window.addEventListener('scroll', function() {
+            const scrollDepth = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+            if (scrollDepth > maxScrollDepth && scrollDepth % 25 === 0) {
+                maxScrollDepth = scrollDepth;
+                trackEvent('scroll_depth', { depth: scrollDepth });
+            }
+        });
+
+        // Track clicks externes
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' && e.target.href) {
+                if (e.target.href.includes('calendar.app.google')) {
+                    trackEvent('calendly_click', { source: e.target.textContent });
+                } else if (e.target.href.includes('mailto:')) {
+                    trackEvent('email_click', { email: e.target.href.replace('mailto:', '') });
+                } else if (e.target.href.includes('tel:')) {
+                    trackEvent('phone_click', { phone: e.target.href.replace('tel:', '') });
+                }
+            }
+        });
+
+        console.log('🚀 Landing page chargée avec succès!');
+        console.log('📊 Supabase connecté:', SUPABASE_URL);
+        console.log('🔗 Session ID:', sessionId);
+    </script>
+</body>
+</html>
