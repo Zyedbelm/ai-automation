@@ -1,0 +1,25 @@
+# Variables d'environnement sensibles
+.env
+.env.local
+.env.production
+
+# Dossier Supabase (code source Edge Functions - local seulement)
+supabase/
+
+# Logs
+*.log
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
