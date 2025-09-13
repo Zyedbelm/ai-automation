@@ -2851,15 +2851,27 @@
         }
 
         function convertURLsToLinks(text) {
-            // Regex pour détecter les URLs (http, https, www)
+            // Regex pour détecter les URLs en excluant la ponctuation finale (. , ; ! ? )
             const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
-            return text.replace(urlRegex, function(url) {
+            return text.replace(urlRegex, function(match) {
+                // Enlever la ponctuation finale si présente
+                let url = match;
+                let trailingPunctuation = '';
+                const punctuationRegex = /([.,:;!?]+)$/;
+                const punctMatch = url.match(punctuationRegex);
+
+                if (punctMatch) {
+                    trailingPunctuation = punctMatch[1];
+                    url = url.replace(punctuationRegex, '');
+                }
+
                 // S'assurer que l'URL commence par http/https
                 let fullUrl = url;
                 if (url.startsWith('www.')) {
                     fullUrl = 'https://' + url;
                 }
-                return `<a href="${fullUrl}" target="_blank" rel="noopener noreferrer" style="color: #FF6B00; text-decoration: underline;">${url}</a>`;
+
+                return `<a href="${fullUrl}" target="_blank" rel="noopener noreferrer" style="color: #FF6B00; text-decoration: underline;">${url}</a>${trailingPunctuation}`;
             });
         }
 
