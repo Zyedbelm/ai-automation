@@ -2853,12 +2853,24 @@
         function convertURLsToLinks(text) {
             // D'abord convertir les liens Markdown [texte](url) en HTML
             text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(match, linkText, url) {
-                return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #FF6B00; text-decoration: underline;">${url}</a>`;
+                // Si le texte du lien est une URL (cas redondant), utiliser "ce lien"
+                const displayText = linkText.startsWith('http') ? 'ce lien' : linkText;
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #FF6B00; text-decoration: underline;">${displayText}</a>`;
             });
 
-            // Ensuite détecter les URLs simples qui ne sont pas déjà traitées
-            const urlRegex = /(?<!<a href="|">)(https?:\/\/[^\s<)]+|www\.[^\s<)]+)(?![^<]*<\/a>)/g;
+            // Ensuite détecter les URLs simples qui ne sont pas déjà dans un lien HTML
+            const urlRegex = /(https?:\/\/[^\s<]+|www\.[^\s<]+)/g;
             return text.replace(urlRegex, function(match) {
+                // Vérifier si cette URL est déjà dans une balise <a>
+                const textBefore = text.substring(0, text.indexOf(match));
+                const lastOpenTag = textBefore.lastIndexOf('<a');
+                const lastCloseTag = textBefore.lastIndexOf('</a>');
+
+                // Si nous sommes à l'intérieur d'une balise <a>, ignorer
+                if (lastOpenTag > lastCloseTag) {
+                    return match;
+                }
+
                 // Enlever la ponctuation finale
                 let url = match;
                 let trailingPunctuation = '';
