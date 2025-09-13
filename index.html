@@ -1285,7 +1285,7 @@
         }
 
         .chatbot-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(135deg, #FF6B00, #FF4500);
             color: white;
             padding: 1rem 1.5rem;
             display: flex;
@@ -1367,7 +1367,7 @@
         }
 
         .chatbot-messages .user-message .message-content {
-            background: var(--primary);
+            background: linear-gradient(135deg, #FF6B00, #FF4500);
             color: white;
             border-bottom-right-radius: 6px;
             text-align: right;
@@ -1407,7 +1407,7 @@
         }
 
         .chatbot-input input:focus {
-            border-color: var(--primary);
+            border-color: #FF6B00;
         }
 
         .chatbot-input button {
@@ -1415,7 +1415,7 @@
             height: 40px;
             border-radius: 50%;
             border: none;
-            background: var(--primary);
+            background: linear-gradient(135deg, #FF6B00, #FF4500);
             color: white;
             cursor: pointer;
             display: flex;
@@ -1425,8 +1425,22 @@
         }
 
         .chatbot-input button:hover {
-            background: var(--primary-dark);
+            background: linear-gradient(135deg, #FF4500, #FF2D00);
             transform: scale(1.1);
+        }
+
+        .chatbot-input button:disabled {
+            background: #ccc !important;
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none !important;
+        }
+
+        .chatbot-input input:disabled {
+            background-color: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
 
         .chatbot-loading {
@@ -2289,7 +2303,7 @@
                 <span></span>
                 <span></span>
             </div>
-            Baptiste est en train d'écrire...
+            Zyed est en train d'écrire...
         </div>
     </div>
 
