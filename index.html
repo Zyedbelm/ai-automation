@@ -2823,11 +2823,8 @@
                 overlay.classList.add('active');
                 document.getElementById('chatbotInput').focus();
 
-                // Generate thread ID if first time opening
-                if (!chatbotThreadId) {
-                    chatbotThreadId = generateThreadId();
-                    console.log('Generated thread ID:', chatbotThreadId);
-                }
+                // ThreadID will be provided by Make.com/OpenAI on first message
+                console.log('Chatbot opened. Current thread ID:', chatbotThreadId);
             }
         }
 
@@ -2891,7 +2888,7 @@
                     },
                     body: JSON.stringify({
                         message: message,
-                        threadId: chatbotThreadId,
+                        threadId: chatbotThreadId || null,
                         timestamp: new Date().toISOString(),
                         source: 'chatbot'
                     })
