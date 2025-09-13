@@ -2850,6 +2850,19 @@
             overlay.classList.remove('active');
         }
 
+        function convertURLsToLinks(text) {
+            // Regex pour détecter les URLs (http, https, www)
+            const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+            return text.replace(urlRegex, function(url) {
+                // S'assurer que l'URL commence par http/https
+                let fullUrl = url;
+                if (url.startsWith('www.')) {
+                    fullUrl = 'https://' + url;
+                }
+                return `<a href="${fullUrl}" target="_blank" rel="noopener noreferrer" style="color: #FF6B00; text-decoration: underline;">${url}</a>`;
+            });
+        }
+
         function addMessage(content, isUser = false) {
             const messagesContainer = document.getElementById('chatbotMessages');
             const messageDiv = document.createElement('div');
@@ -2861,8 +2874,11 @@
                 minute: '2-digit'
             });
 
+            // Convertir les URLs en liens pour les messages du bot
+            const processedContent = isUser ? content : convertURLsToLinks(content);
+
             messageDiv.innerHTML = `
-                <div class="message-content">${content}</div>
+                <div class="message-content">${processedContent}</div>
                 <div class="message-time">${timeString}</div>
             `;
 
