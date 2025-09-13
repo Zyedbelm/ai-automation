@@ -2851,13 +2851,18 @@
         }
 
         function convertURLsToLinks(text) {
-            // Regex pour détecter les URLs en excluant la ponctuation finale (. , ; ! ? )
-            const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+            // D'abord convertir les liens Markdown [texte](url) en HTML
+            text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(match, linkText, url) {
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #FF6B00; text-decoration: underline;">${url}</a>`;
+            });
+
+            // Ensuite détecter les URLs simples qui ne sont pas déjà traitées
+            const urlRegex = /(?<!<a href="|">)(https?:\/\/[^\s<)]+|www\.[^\s<)]+)(?![^<]*<\/a>)/g;
             return text.replace(urlRegex, function(match) {
-                // Enlever la ponctuation finale si présente
+                // Enlever la ponctuation finale
                 let url = match;
                 let trailingPunctuation = '';
-                const punctuationRegex = /([.,:;!?]+)$/;
+                const punctuationRegex = /([.,:;!?)\]]+)$/;
                 const punctMatch = url.match(punctuationRegex);
 
                 if (punctMatch) {
