@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Webhooks Make.com Sécurisés</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-weight: 600;
+        }
+        .btn-primary { background: #FF6B00; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .result {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { border-left: 4px solid #10b981; }
+        .error { border-left: 4px solid #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Webhooks Make.com Sécurisés</h1>
+
+    <div class="test-card">
+        <h2>🔒 Test Edge Function Supabase</h2>
+        <p>Teste les webhooks Blueprint Store via l'Edge Function sécurisée</p>
+
+        <button class="btn btn-primary" onclick="testCalculatorWebhook()">
+            🧮 Test Calculator
+        </button>
+
+        <button class="btn btn-secondary" onclick="testChatbotWebhook()">
+            💬 Test Chatbot
+        </button>
+
+        <button class="btn btn-success" onclick="testContactWebhook()">
+            📧 Test Contact
+        </button>
+
+        <div id="webhookResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>⚙️ Configuration</h2>
+        <p><strong>Edge Function URL:</strong></p>
+        <code id="edgeFunctionUrl"></code>
+
+        <p><strong>Statut WEBHOOK_API_KEY:</strong></p>
+        <span id="apiKeyStatus">❓ Non vérifiée</span>
+
+        <button class="btn btn-secondary" onclick="checkConfiguration()">
+            🔍 Vérifier Configuration
+        </button>
+    </div>
+
+    <!-- Include necessary scripts -->
+    <script src="config.js"></script>
+    <script src="webhook-helper.js"></script>
+
+    <script>
+        // Display configuration
+        document.getElementById('edgeFunctionUrl').textContent =
+            `${window.ENV?.SUPABASE_URL}/functions/v1/send-webhook`;
+
+        // Test functions
+        async function testCalculatorWebhook() {
+            showResult('🧮 Test en cours...', 'info');
+
+            const testData = {
+                company: "Test Company",
+                employees: 50,
+                processes: 5,
+                timePerProcess: 2,
+                costPerHour: 25,
+                calculatedSavings: 12500,
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const result = await window.webhookHelper.sendCalculator(testData);
+                showResult(`✅ Calculator webhook success:\n${JSON.stringify(result, null, 2)}`, 'success');
+            } catch (error) {
+                showResult(`❌ Calculator webhook error:\n${error.message}`, 'error');
+            }
+        }
+
+        async function testChatbotWebhook() {
+            showResult('💬 Test en cours...', 'info');
+
+            const testData = {
+                message: "Test message from chatbot",
+                user_id: "test-user-123",
+                session_id: "test-session-456",
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const result = await window.webhookHelper.sendChatbot(testData);
+                showResult(`✅ Chatbot webhook success:\n${JSON.stringify(result, null, 2)}`, 'success');
+            } catch (error) {
+                showResult(`❌ Chatbot webhook error:\n${error.message}`, 'error');
+            }
+        }
+
+        async function testContactWebhook() {
+            showResult('📧 Test en cours...', 'info');
+
+            const testData = {
+                name: "Test User",
+                email: "test@example.com",
+                company: "Test Company",
+                message: "Test contact form submission",
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const result = await window.webhookHelper.sendContact(testData);
+                showResult(`✅ Contact webhook success:\n${JSON.stringify(result, null, 2)}`, 'success');
+            } catch (error) {
+                showResult(`❌ Contact webhook error:\n${error.message}`, 'error');
+            }
+        }
+
+        function checkConfiguration() {
+            const supabaseUrl = window.ENV?.SUPABASE_URL;
+            const anonKey = window.ENV?.SUPABASE_ANON_KEY;
+
+            let status = '';
+
+            if (supabaseUrl && anonKey) {
+                status = '✅ Configuration Supabase OK';
+                document.getElementById('apiKeyStatus').textContent = status;
+                document.getElementById('apiKeyStatus').style.color = '#10b981';
+            } else {
+                status = '❌ Configuration Supabase manquante';
+                document.getElementById('apiKeyStatus').textContent = status;
+                document.getElementById('apiKeyStatus').style.color = '#ef4444';
+            }
+
+            showResult(`Configuration check:\n- Supabase URL: ${supabaseUrl || 'MISSING'}\n- Anon Key: ${anonKey ? 'SET' : 'MISSING'}`,
+                      supabaseUrl && anonKey ? 'success' : 'error');
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('webhookResult');
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+
+            // Remove previous classes
+            resultDiv.classList.remove('success', 'error');
+
+            // Add appropriate class
+            if (type === 'success') {
+                resultDiv.classList.add('success');
+            } else if (type === 'error') {
+                resultDiv.classList.add('error');
+            }
+        }
+
+        // Auto-check configuration on load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkConfiguration();
+        });
+    </script>
+</body>
+</html>

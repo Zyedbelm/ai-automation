@@ -12,7 +12,7 @@ class ConfigLoader {
             console.log('🔧 Chargement de la configuration...');
 
             // Clé anon hard-codée pour l'authentification initiale Edge Function
-            const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndseXNtZGJvZXllYnBya2d5YXVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4MTc1MDcsImV4cCI6MjA2NzM5MzUwN30.qi6B7pGd-2l-YivnCJn57AzESiHAGH_MKnd7_DOoAf0';
+            const anonKey = window.ENV?.SUPABASE_ANON_KEY;
 
             const response = await fetch(this.configURL, {
                 method: 'GET',

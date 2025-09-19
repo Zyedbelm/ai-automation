@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blueprint Store - Automatisations Make.com Premium</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+
+        .blueprints-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .blueprint-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .blueprint-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+        }
+
+        .blueprint-header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .blueprint-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .blueprint-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .blueprint-description {
+            opacity: 0.9;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .blueprint-content {
+            padding: 2rem;
+        }
+
+        .price-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #2d3748;
+        }
+
+        .price-label {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-left: 0.5rem;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .features-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            color: #4a5568;
+        }
+
+        .features-list li::before {
+            content: '✓';
+            color: #48bb78;
+            font-weight: bold;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .manual-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .manual-section.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .manual-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .manual-title::before {
+            content: '📖';
+            margin-right: 0.5rem;
+        }
+
+        .manual-steps {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+
+        .manual-steps li {
+            counter-increment: step-counter;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .manual-steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 1rem;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .manual-steps li:last-child {
+            border-bottom: none;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-paid {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-pending {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .blueprints-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-title {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="header-title">Blueprint Store</h1>
+            <p class="header-subtitle">Automatisations Make.com Premium pour professionnels</p>
+        </header>
+
+        <div class="blueprints-grid">
+            <!-- Blueprint Example -->
+            <div class="blueprint-card" data-blueprint-id="lead-generation-system">
+                <div class="blueprint-header">
+                    <h2 class="blueprint-title">Système de Génération de Leads</h2>
+                    <p class="blueprint-description">
+                        Automatisation complète pour capturer, qualifier et nourrir vos prospects automatiquement
+                    </p>
+                </div>
+
+                <div class="blueprint-content">
+                    <div class="price-section">
+                        <div>
+                            <span class="price">€97</span>
+                            <span class="price-label">prix unique</span>
+                        </div>
+                    </div>
+
+                    <ul class="features-list">
+                        <li>Capture automatique des leads</li>
+                        <li>Qualification intelligente par scoring</li>
+                        <li>Séquences email personnalisées</li>
+                        <li>Intégration CRM native</li>
+                        <li>Rapports et analytics détaillés</li>
+                        <li>Support et mises à jour inclus</li>
+                    </ul>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="initiatePayment('lead-generation-system', 97)">
+                            Acheter maintenant
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleManual('lead-generation-system')">
+                            Voir le manuel
+                        </button>
+                    </div>
+
+                    <button class="btn btn-primary" id="download-lead-generation-system" onclick="downloadBlueprint('lead-generation-system')" style="display: none; width: 100%;">
+                        <span id="download-text-lead-generation-system">Télécharger le Blueprint</span>
+                    </button>
+
+                    <div class="manual-section" id="manual-lead-generation-system">
+                        <h3 class="manual-title">Manuel d'Installation Détaillé</h3>
+                        <ol class="manual-steps">
+                            <li>
+                                <strong>Prérequis :</strong><br>
+                                • Compte Make.com actif (plan Pro recommandé)<br>
+                                • Accès à votre CRM (HubSpot, Salesforce, ou Pipedrive)<br>
+                                • Compte email marketing (Mailchimp, ActiveCampaign, etc.)
+                            </li>
+                            <li>
+                                <strong>Import du Blueprint :</strong><br>
+                                • Connectez-vous à Make.com<br>
+                                • Cliquez sur "Create a new scenario"<br>
+                                • Sélectionnez "Import Blueprint"<br>
+                                • Uploadez le fichier JSON téléchargé
+                            </li>
+                            <li>
+                                <strong>Configuration des connexions :</strong><br>
+                                • Configurez votre webhook d'entrée<br>
+                                • Connectez votre CRM avec vos identifiants<br>
+                                • Configurez l'intégration email marketing<br>
+                                • Testez chaque connexion individuellement
+                            </li>
+                            <li>
+                                <strong>Paramétrage des filtres :</strong><br>
+                                • Définissez vos critères de qualification<br>
+                                • Configurez le scoring automatique<br>
+                                • Personnalisez les tags et catégories<br>
+                                • Ajustez les règles de routage
+                            </li>
+                            <li>
+                                <strong>Personnalisation des messages :</strong><br>
+                                • Adaptez les templates email à votre marque<br>
+                                • Configurez les séquences de nurturing<br>
+                                • Définissez les déclencheurs d'actions<br>
+                                • Testez les scénarios avec des données fictives
+                            </li>
+                            <li>
+                                <strong>Tests et validation :</strong><br>
+                                • Effectuez des tests avec de vrais leads<br>
+                                • Vérifiez la synchronisation CRM<br>
+                                • Validez l'envoi des emails<br>
+                                • Contrôlez les rapports et métriques
+                            </li>
+                            <li>
+                                <strong>Mise en production :</strong><br>
+                                • Activez le scénario en mode production<br>
+                                • Configurez les notifications d'erreur<br>
+                                • Planifiez une surveillance régulière<br>
+                                • Documentez votre configuration pour votre équipe
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="status-indicator status-pending" id="status-lead-generation-system">
+                    En attente
+                </div>
+            </div>
+
+            <!-- Autre blueprint d'exemple -->
+            <div class="blueprint-card" data-blueprint-id="social-media-automation">
+                <div class="blueprint-header">
+                    <h2 class="blueprint-title">Automatisation Réseaux Sociaux</h2>
+                    <p class="blueprint-description">
+                        Publiez, engagez et analysez vos performances sur tous vos réseaux sociaux automatiquement
+                    </p>
+                </div>
+
+                <div class="blueprint-content">
+                    <div class="price-section">
+                        <div>
+                            <span class="price">€67</span>
+                            <span class="price-label">prix unique</span>
+                        </div>
+                    </div>
+
+                    <ul class="features-list">
+                        <li>Publication multi-plateformes</li>
+                        <li>Planification intelligente</li>
+                        <li>Réponses automatiques aux mentions</li>
+                        <li>Analyse de sentiment</li>
+                        <li>Rapports de performance</li>
+                        <li>Gestion des hashtags optimisée</li>
+                    </ul>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="initiatePayment('social-media-automation', 67)">
+                            Acheter maintenant
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleManual('social-media-automation')">
+                            Voir le manuel
+                        </button>
+                    </div>
+
+                    <button class="btn btn-primary" id="download-social-media-automation" onclick="downloadBlueprint('social-media-automation')" style="display: none; width: 100%;">
+                        <span id="download-text-social-media-automation">Télécharger le Blueprint</span>
+                    </button>
+
+                    <div class="manual-section" id="manual-social-media-automation">
+                        <h3 class="manual-title">Manuel d'Installation Détaillé</h3>
+                        <ol class="manual-steps">
+                            <li>
+                                <strong>Prérequis :</strong><br>
+                                • Compte Make.com actif<br>
+                                • Comptes sur les réseaux sociaux (Facebook, Instagram, LinkedIn, Twitter)<br>
+                                • Outil de planification de contenu (Buffer, Hootsuite ou similaire)
+                            </li>
+                            <li>
+                                <strong>Import et configuration de base :</strong><br>
+                                • Importez le blueprint dans Make.com<br>
+                                • Configurez les connexions aux APIs des réseaux sociaux<br>
+                                • Définissez vos calendriers de publication<br>
+                                • Configurez les webhooks nécessaires
+                            </li>
+                            <li>
+                                <strong>Personnalisation du contenu :</strong><br>
+                                • Adaptez les templates de posts à votre ton<br>
+                                • Configurez les hashtags par secteur<br>
+                                • Définissez les règles de formatage par plateforme<br>
+                                • Créez vos bibliothèques de contenu
+                            </li>
+                            <li>
+                                <strong>Configuration de l'engagement :</strong><br>
+                                • Paramétrez les réponses automatiques<br>
+                                • Définissez les mots-clés de surveillance<br>
+                                • Configurez les alertes de mention<br>
+                                • Créez des règles d'escalade
+                            </li>
+                            <li>
+                                <strong>Analytics et reporting :</strong><br>
+                                • Connectez Google Analytics et UTM<br>
+                                • Configurez les rapports automatisés<br>
+                                • Définissez vos KPIs prioritaires<br>
+                                • Créez des dashboards personnalisés
+                            </li>
+                            <li>
+                                <strong>Tests et optimisation :</strong><br>
+                                • Effectuez des tests A/B sur vos posts<br>
+                                • Vérifiez la publication sur chaque plateforme<br>
+                                • Testez les réponses automatiques<br>
+                                • Validez les rapports de performance
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="status-indicator status-pending" id="status-social-media-automation">
+                    En attente
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>© 2024 Blueprint Store - Automatisations Make.com Premium</p>
+            <p>Support technique inclus • Mises à jour gratuites • Garantie satisfaction</p>
+        </footer>
+    </div>
+
+    <script>
+        // Configuration
+        const STRIPE_PUBLIC_KEY = window.ENV?.STRIPE_PUBLISHABLE_KEY || 'pk_test_demo';
+        const API_URL = 'http://localhost:3001'; // URL de votre serveur local
+
+        // Initialize Stripe
+        const stripe = Stripe(STRIPE_PUBLIC_KEY);
+
+        // Toggle manual visibility
+        function toggleManual(blueprintId) {
+            const manual = document.getElementById(`manual-${blueprintId}`);
+            manual.classList.toggle('active');
+        }
+
+        // Initiate payment process
+        async function initiatePayment(blueprintId, price) {
+            const button = event.target;
+            const originalText = button.innerHTML;
+
+            // Show loading state
+            button.innerHTML = '<div class="loading"></div> Traitement...';
+            button.disabled = true;
+
+            try {
+                // Create payment intent
+                const response = await fetch(`${API_URL}/create-payment-intent`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        blueprintId: blueprintId,
+                        amount: price * 100, // Convert to cents
+                        currency: 'eur'
+                    })
+                });
+
+                const { client_secret } = await response.json();
+
+                // Redirect to Stripe Checkout or confirm payment
+                const { error } = await stripe.confirmCardPayment(client_secret, {
+                    payment_method: {
+                        card: {
+                            // This would normally be a card element
+                            // For demo purposes, we'll simulate success
+                        }
+                    }
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                // Simulate successful payment for demo
+                setTimeout(() => {
+                    handlePaymentSuccess(blueprintId);
+                }, 2000);
+
+            } catch (error) {
+                console.error('Payment error:', error);
+                alert('Erreur lors du paiement. Veuillez réessayer.');
+            } finally {
+                // Restore button
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        // Handle successful payment
+        function handlePaymentSuccess(blueprintId) {
+            // Update UI to show payment success
+            const statusIndicator = document.getElementById(`status-${blueprintId}`);
+            const downloadButton = document.getElementById(`download-${blueprintId}`);
+            const purchaseButton = document.querySelector(`[data-blueprint-id="${blueprintId}"] .btn-primary`);
+
+            // Update status
+            statusIndicator.textContent = 'Payé ✓';
+            statusIndicator.className = 'status-indicator status-paid';
+
+            // Show download button and hide purchase button
+            downloadButton.style.display = 'block';
+            purchaseButton.style.display = 'none';
+
+            // Show success message
+            alert('Paiement réussi ! Vous pouvez maintenant télécharger votre blueprint.');
+        }
+
+        // Download blueprint
+        async function downloadBlueprint(blueprintId) {
+            const downloadButton = document.getElementById(`download-${blueprintId}`);
+            const downloadText = document.getElementById(`download-text-${blueprintId}`);
+
+            downloadText.innerHTML = '<div class="loading"></div> Téléchargement...';
+            downloadButton.disabled = true;
+
+            try {
+                // Request download from server
+                const response = await fetch(`${API_URL}/download-blueprint/${blueprintId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('payment_token_' + blueprintId)}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors du téléchargement');
+                }
+
+                // Get the file blob
+                const blob = await response.blob();
+
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${blueprintId}-blueprint.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+            } catch (error) {
+                console.error('Download error:', error);
+                alert('Erreur lors du téléchargement. Veuillez contacter le support.');
+            } finally {
+                downloadText.textContent = 'Télécharger le Blueprint';
+                downloadButton.disabled = false;
+            }
+        }
+
+        // Check for existing payments on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // This would typically check with your backend for existing purchases
+            // For demo purposes, we'll simulate checking localStorage
+            const blueprints = ['lead-generation-system', 'social-media-automation'];
+
+            blueprints.forEach(blueprintId => {
+                const isPaid = localStorage.getItem(`paid_${blueprintId}`);
+                if (isPaid) {
+                    handlePaymentSuccess(blueprintId);
+                }
+            });
+        });
+
+        // For demo purposes - simulate payment success
+        function simulatePayment(blueprintId) {
+            localStorage.setItem(`paid_${blueprintId}`, 'true');
+            localStorage.setItem(`payment_token_${blueprintId}`, 'demo_token_' + Date.now());
+            handlePaymentSuccess(blueprintId);
+        }
+
+        // Add demo buttons (remove in production)
+        setTimeout(() => {
+            const demoStyle = document.createElement('style');
+            demoStyle.textContent = `
+                .demo-controls {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: rgba(255,255,255,0.9);
+                    padding: 1rem;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    z-index: 1000;
+                }
+                .demo-controls h4 {
+                    margin-bottom: 0.5rem;
+                    color: #333;
+                }
+                .demo-btn {
+                    display: block;
+                    width: 100%;
+                    padding: 0.5rem;
+                    margin: 0.25rem 0;
+                    background: #667eea;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 0.8rem;
+                }
+            `;
+            document.head.appendChild(demoStyle);
+
+            const demoControls = document.createElement('div');
+            demoControls.className = 'demo-controls';
+            demoControls.innerHTML = `
+                <h4>🧪 Demo</h4>
+                <button class="demo-btn" onclick="simulatePayment('lead-generation-system')">
+                    Simuler paiement Leads
+                </button>
+                <button class="demo-btn" onclick="simulatePayment('social-media-automation')">
+                    Simuler paiement Social
+                </button>
+                <button class="demo-btn" onclick="localStorage.clear(); location.reload()">
+                    Reset démo
+                </button>
+            `;
+            document.body.appendChild(demoControls);
+        }, 1000);
+    </script>
+</body>
+</html>

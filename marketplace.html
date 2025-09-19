@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace Blueprints - Baptiste Zyed MEDDEB</title>
+    <meta name="description" content="Automatisations Make.com prêtes à l'emploi. Templates experts pour automatiser vos processus métier rapidement.">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Security Utils -->
+    <script src="security-utils.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --accent: #f59e0b;
+            --success: #059669;
+            --white: #ffffff;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-900: #0f172a;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--gray-900);
+            background: var(--white);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--gray-100);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: 'Fraunces', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Style spécial pour le bouton Blueprints */
+        .nav-links a[href*="marketplace"]:not(.nav-cta) {
+            border: 2px solid #1e3a8a;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a[href*="marketplace"]:hover {
+            background-color: #1e3a8a;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .nav-cta {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-cta:hover {
+            background: var(--primary-dark);
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #FF6B00, #FF4500);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, #FF4500, #FF2D00);
+            transform: translateY(-1px);
+        }
+
+        /* Header */
+        .marketplace-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .marketplace-header h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .marketplace-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Filters */
+        .filters-section {
+            background: var(--gray-50);
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--secondary);
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gray-100);
+            border-radius: 8px;
+            background: white;
+            font-size: 0.875rem;
+        }
+
+        .search-input {
+            min-width: 300px;
+        }
+
+        /* Blueprint Grid */
+        .blueprints-section {
+            padding: 3rem 0;
+        }
+
+        .blueprints-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .blueprint-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .blueprint-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+
+        .blueprint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .blueprint-category {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .blueprint-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .blueprint-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray-900);
+        }
+
+        .blueprint-description {
+            color: var(--secondary);
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        .blueprint-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .blueprint-features {
+            margin-bottom: 1.5rem;
+        }
+
+        .features-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray-900);
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            font-size: 0.875rem;
+            color: var(--secondary);
+            margin-bottom: 0.25rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .blueprint-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 0.875rem;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-100);
+            opacity: 0.8;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            margin: 2rem;
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid var(--gray-100);
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 1;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-100);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-section {
+            margin-bottom: 2rem;
+        }
+
+        .modal-section h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--gray-900);
+        }
+
+        .installation-steps {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+
+        .installation-steps li {
+            counter-increment: step-counter;
+            margin-bottom: 1rem;
+            padding-left: 3rem;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .installation-steps li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: var(--primary);
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 2rem 2rem;
+            border-top: 1px solid var(--gray-100);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .purchase-status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .purchase-status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .purchase-status.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .purchase-status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .download-section {
+            background: var(--gray-50);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+
+        .download-section.locked {
+            opacity: 0.6;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--gray-900);
+            color: white;
+            padding: 3rem 0 1rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            color: #94a3b8;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            padding-top: 2rem;
+            text-align: center;
+            color: #94a3b8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .marketplace-header h1 {
+                font-size: 2rem;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input {
+                min-width: auto;
+            }
+
+            .blueprints-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                margin: 1rem;
+                max-height: 90vh;
+            }
+
+            .modal-body {
+                padding: 1rem;
+            }
+
+            .modal-header {
+                padding: 1rem;
+            }
+
+            .modal-footer {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button onclick="goBack()" class="back-btn">
+                    ← RETOUR
+                </button>
+                <a href="index.html" class="logo">BZM</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html#calculator">Calculateur</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="marketplace.html">Blueprints</a></li>
+                <li><a href="index.html#testimonials">Témoignages</a></li>
+                <li><a href="index.html#about">À propos</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+            <a href="https://calendar.app.google/vaCEdgHuR2Ffdrp3A" class="nav-cta" target="_blank">Réserver un appel</a>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="marketplace-header">
+        <div class="container">
+            <h1>🚀 Blueprints Make.com</h1>
+            <p>Automatisations prêtes à l'emploi pour booster votre business. Installation facile, support inclus.</p>
+        </div>
+    </header>
+
+    <!-- Filters -->
+    <section class="filters-section">
+        <div class="container">
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="searchInput">Rechercher</label>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Chercher un blueprint...">
+                </div>
+
+                <div class="filter-group">
+                    <label for="categoryFilter">Catégorie</label>
+                    <select id="categoryFilter">
+                        <option value="">Toutes les catégories</option>
+                        <option value="Lead Generation">Lead Generation</option>
+                        <option value="Social Media">Social Media</option>
+                        <option value="E-commerce">E-commerce</option>
+                        <option value="CRM & Sales">CRM & Sales</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Analytics">Analytics</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="priceFilter">Prix</label>
+                    <select id="priceFilter">
+                        <option value="">Tous les prix</option>
+                        <option value="0-50">0 - 50€</option>
+                        <option value="50-100">50 - 100€</option>
+                        <option value="100+">100€+</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="difficultyFilter">Difficulté</label>
+                    <select id="difficultyFilter">
+                        <option value="">Toutes</option>
+                        <option value="Débutant">Débutant</option>
+                        <option value="Intermédiaire">Intermédiaire</option>
+                        <option value="Avancé">Avancé</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blueprints Grid -->
+    <section class="blueprints-section">
+        <div class="container">
+            <div id="blueprintsGrid" class="blueprints-grid">
+                <!-- Blueprints will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Blueprint Modal -->
+    <div id="blueprintModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Blueprint Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div id="purchaseStatus" class="purchase-status" style="display: none;"></div>
+
+                <div class="modal-section">
+                    <h3>📋 Aperçu du Blueprint</h3>
+                    <div id="modalDescription"></div>
+                    <div id="modalFeatures"></div>
+                </div>
+
+                <div class="modal-section">
+                    <h3>🔧 Guide d'Installation</h3>
+                    <div id="modalInstallation"></div>
+                </div>
+
+                <div class="modal-section">
+                    <h3>💡 Prérequis Techniques</h3>
+                    <div id="modalPrerequisites"></div>
+                </div>
+
+                <div class="download-section" id="downloadSection">
+                    <h3>💳 Processus d'achat</h3>
+                    <div style="background: #f0f7ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                        <h4 style="color: #1e40af; margin-bottom: 0.5rem;">🚀 Achat simplifié en 3 étapes :</h4>
+                        <ol style="color: #374151; margin-left: 1.5rem; line-height: 1.6;">
+                            <li>Cliquez sur "Acheter sur Gumroad" ci-dessous</li>
+                            <li>Complétez le paiement sécurisé sur Gumroad</li>
+                            <li>Après paiement, vous serez redirigé vers une page avec un bouton de téléchargement direct</li>
+                        </ol>
+                        <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem;">
+                            ✅ Téléchargement immédiat • 📧 Reçu par email • 🔒 Paiement sécurisé
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Fermer</button>
+                <button class="btn btn-primary" id="purchaseBtn">
+                    🛒 Acheter sur Gumroad - <span id="modalPrice">0</span>€
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:3001';
+
+        let allBlueprints = [];
+        let filteredBlueprints = [];
+        let currentBlueprint = null;
+        let purchases = new Set(); // Track purchased blueprints
+
+        // Sample blueprint data (loaded from admin or API)
+        const sampleBlueprints = [
+            {
+                id: 'test-blueprint-1euro',
+                name: 'test-blueprint-simple',
+                title: '🧪 Blueprint Test - 1 Franc',
+                description: 'Blueprint de test pour valider le processus d\'achat et de téléchargement - Prix symbolique de 1 franc',
+                long_description: 'Ce blueprint de test vous permet de tester entièrement le processus d\'achat : clic sur achat, redirection vers Gumroad, et téléchargement du fichier JSON. Parfait pour vérifier que tout fonctionne avant d\'acheter un blueprint plus coûteux. Contient un workflow Make.com simple avec webhook et transformation JSON.',
+                price: 100, // 1€
+                currency: 'eur',
+                category: 'Analytics',
+                difficulty_level: 'Débutant',
+                estimated_setup_time: '5-10 minutes',
+                gumroad_url: 'https://baptistezm.gumroad.com/l/test-blueprint',
+                features: [
+                    'Workflow Make.com simple à importer',
+                    'Webhook configuré pour tests',
+                    'Transformation JSON basique',
+                    'Guide d\'installation simplifié',
+                    'Perfect pour tester le système d\'achat'
+                ],
+                prerequisites: [
+                    'Compte Make.com (gratuit suffisant)',
+                    'Aucune API externe requise'
+                ],
+                installation_steps: [
+                    '🚀 Import simple : Se connecter à Make.com et importer le fichier JSON téléchargé',
+                    '🔗 Test du webhook : Copier l\'URL de webhook générée et tester avec une requête simple',
+                    '✅ Validation : Vérifier que les données JSON sont bien traitées dans Make.com'
+                ]
+            },
+            {
+                id: 'expense-ocr-automation',
+                name: 'expense-ocr-mailhook',
+                title: 'Lecteur Automatique de Notes de Frais par Email',
+                description: 'Automatisation complète : réception email → OCR intelligent → extraction données → enregistrement comptable automatique',
+                long_description: 'Ce blueprint révolutionnaire transforme la gestion de vos notes de frais en un processus 100% automatisé. Dès qu\'une photo de ticket ou facture arrive par email (via mailhook), le système utilise l\'OCR avancé pour extraire automatiquement toutes les informations : montant, date, TVA, catégorie, fournisseur. Les données sont ensuite classées intelligemment et intégrées directement dans votre logiciel comptable (Xero, QuickBooks) ou votre CRM avec validation automatique des règles fiscales.',
+                price: 14700, // 147€
+                currency: 'eur',
+                category: 'Analytics',
+                difficulty_level: 'Avancé',
+                estimated_setup_time: '90-120 minutes',
+                gumroad_url: 'https://baptistezm.gumroad.com/l/expense-ocr-automation',
+                features: [
+                    'Réception automatique par email (mailhook)',
+                    'OCR intelligent multi-langue (Français, Anglais, Allemand)',
+                    'Extraction automatique : montant, date, TVA, fournisseur',
+                    'Classification intelligente par catégorie comptable',
+                    'Validation des règles fiscales suisses/françaises',
+                    'Intégration directe Xero, QuickBooks, Sage',
+                    'Détection et prévention des doublons',
+                    'Notifications Slack/Teams en cas d\'anomalie',
+                    'Archivage automatique des justificatifs',
+                    'Rapports mensuels de dépenses par catégorie',
+                    'Alertes dépassement budget',
+                    'Export automatique pour expert-comptable'
+                ],
+                prerequisites: [
+                    'Compte Make.com Pro (minimum 10 000 opérations/mois)',
+                    'Logiciel comptable avec API (Xero recommandé)',
+                    'Adresse email dédiée pour les tickets',
+                    'Compte Google Drive ou Dropbox pour archivage',
+                    'API OCR (Google Vision ou AWS Textract)',
+                    'Slack ou Teams pour notifications (optionnel)'
+                ],
+                installation_steps: [
+                    '📧 Configuration du mailhook : Créer une adresse email dédiée et connecter le webhook Make.com pour intercepter tous les emails entrants avec pièces jointes',
+                    '🔍 Configuration OCR : Connecter l\'API Google Vision ou AWS Textract, configurer la reconnaissance multi-langue et définir les templates d\'extraction pour différents types de documents',
+                    '🏷️ Paramétrage des règles métier : Définir les catégories comptables, configurer les règles de validation TVA, paramétrer les seuils d\'alerte et les règles de classification automatique',
+                    '💼 Intégration comptable : Connecter votre logiciel comptable (Xero/QuickBooks), mapper les comptes comptables, configurer les codes TVA et tester la création automatique d\'écritures',
+                    '🔄 Tests et validation : Tester avec différents types de tickets (restaurant, taxi, carburant, fournitures), vérifier la précision de l\'OCR, valider les intégrations et ajuster les règles si nécessaire',
+                    '📊 Configuration des rapports : Paramétrer les rapports automatiques, configurer les notifications d\'anomalies et mettre en place le système d\'archivage automatique',
+                    '🚀 Mise en production : Activer le workflow, former les utilisateurs à l\'envoi par email et mettre en place le suivi des performances'
+                ]
+            },
+            {
+                id: 'email-ai-assistant',
+                name: 'email-ai-notion-manager',
+                title: 'Assistant IA pour Emails : Analyse, Réponse et Classement Notion',
+                description: 'IA avancée qui lit, analyse, classe vos emails et propose des réponses personnalisées avec organisation automatique dans Notion',
+                long_description: 'Cet assistant IA révolutionnaire transforme votre gestion d\'emails en une expérience fluide et intelligente. Le système analyse automatiquement chaque email entrant, détermine le sentiment, l\'urgence et la catégorie, puis propose une réponse personnalisée adaptée au contexte. Tous les échanges sont automatiquement organisés dans Notion avec un système de tags intelligent, un suivi des conversations et une base de connaissance qui s\'enrichit avec chaque interaction. L\'IA apprend de vos habitudes de réponse pour améliorer continuellement ses suggestions.',
+                price: 11900, // 119€
+                currency: 'eur',
+                category: 'CRM & Sales',
+                difficulty_level: 'Intermédiaire',
+                estimated_setup_time: '60-75 minutes',
+                gumroad_url: 'https://baptistezm.gumroad.com/l/email-ai-assistant',
+                features: [
+                    'Analyse IA avancée : sentiment, urgence, intention',
+                    'Classification automatique par catégorie (vente, support, admin)',
+                    'Génération de réponses personnalisées avec OpenAI GPT-4',
+                    'Organisation automatique dans Notion avec tags intelligents',
+                    'Détection des emails prioritaires et VIP',
+                    'Base de connaissance évolutive dans Notion',
+                    'Suivi des conversations et historique complet',
+                    'Réponses automatiques pour emails fréquents',
+                    'Escalade automatique selon l\'urgence',
+                    'Résumés quotidiens des interactions importantes',
+                    'Templates de réponse adaptatifs selon le profil',
+                    'Intégration calendrier pour prise de RDV automatique'
+                ],
+                prerequisites: [
+                    'Compte Make.com Standard ou Pro',
+                    'Compte OpenAI avec accès GPT-4',
+                    'Workspace Notion avec API activée',
+                    'Gmail ou Outlook avec API access',
+                    'Compte Google Calendar (pour RDV automatiques)',
+                    'Base de données Notion pré-configurée (fournie)'
+                ],
+                installation_steps: [
+                    '📨 Configuration email : Connecter Gmail/Outlook à Make.com, configurer les triggers pour nouveaux emails, paramétrer les filtres d\'exclusion (newsletters, spam) et définir les comptes prioritaires',
+                    '🤖 Intégration OpenAI : Connecter l\'API OpenAI GPT-4, configurer les prompts d\'analyse (sentiment, urgence, catégorie), paramétrer les templates de réponse et ajuster les paramètres de créativité',
+                    '📚 Configuration Notion : Importer la base de données fournie, connecter l\'API Notion, configurer les propriétés personnalisées et paramétrer le système de tags automatiques',
+                    '🎯 Paramétrage des règles : Définir les critères de priorité, configurer les règles de classification, paramétrer les seuils d\'urgence et créer les templates de réponse par catégorie',
+                    '🔄 Tests d\'analyse : Tester l\'analyse IA sur différents types d\'emails, valider la précision des classifications, ajuster les prompts et vérifier l\'intégration Notion',
+                    '✨ Optimisation des réponses : Tester la génération de réponses, ajuster les templates selon votre style, configurer l\'apprentissage adaptatif et valider la cohérence du ton',
+                    '🚀 Activation complète : Activer tous les workflows, configurer les notifications d\'escalade et former à l\'utilisation du dashboard Notion'
+                ]
+            },
+            {
+                id: 'content-creation-ai',
+                name: 'instagram-content-ai-replicate',
+                title: 'Studio IA : Création Complète de Contenu Instagram (Texte + Image + Vidéo)',
+                description: 'Workflow IA complet qui génère automatiquement du contenu Instagram professionnel : posts, stories, reels avec Replicate, Midjourney et GPT-4',
+                long_description: 'Ce studio de création IA révolutionnaire automatise entièrement votre présence Instagram. À partir d\'un simple brief ou mot-clé, le système génère automatiquement des posts captivants avec GPT-4, crée des visuels époustouflants avec Midjourney/Replicate, produit des vidéos dynamiques avec des modèles IA avancés et programme la publication optimale. Le workflow inclut une analyse des tendances, l\'adaptation du contenu à votre audience, la génération de hashtags pertinents et un système de validation avant publication. Parfait pour entrepreneurs, agences et créateurs qui veulent maintenir une présence Instagram professionnelle sans y passer des heures.',
+                price: 19700, // 197€
+                currency: 'eur',
+                category: 'Content Creation',
+                difficulty_level: 'Débutant',
+                estimated_setup_time: '45-60 minutes',
+                gumroad_url: 'https://baptistezm.gumroad.com/l/content-creation-ai',
+                features: [
+                    'Génération de posts Instagram avec GPT-4 (captions engageantes)',
+                    'Création d\'images avec Midjourney/Replicate (styles personnalisés)',
+                    'Production de vidéos courtes avec Runway ML/Pika Labs',
+                    'Génération automatique de hashtags tendance et pertinents',
+                    'Planification intelligente selon l\'audience (meilleurs horaires)',
+                    'Adaptation du contenu selon les performances passées',
+                    'Création de stories interactives (sondages, questions)',
+                    'Génération de carrousels éducatifs automatisés',
+                    'Analyse des tendances et adaptation du contenu',
+                    'Templates personnalisés selon votre marque (couleurs, fonts)',
+                    'Système de validation avant publication',
+                    'Rapports de performance et optimisation continue'
+                ],
+                prerequisites: [
+                    'Compte Make.com Standard (5000 opérations/mois suffisent)',
+                    'Compte OpenAI avec accès GPT-4',
+                    'Compte Replicate ou Midjourney pour génération d\'images',
+                    'Compte Instagram Business avec API access',
+                    'Compte Meta Business (pour programmer les publications)',
+                    'Compte Google Drive pour stockage des médias',
+                    'Budget IA estimé : 20-40€/mois selon volume'
+                ],
+                installation_steps: [
+                    '🎨 Configuration des outils IA : Connecter OpenAI GPT-4 pour la rédaction, configurer Replicate/Midjourney pour les images, paramétrer Runway ML pour les vidéos et définir vos styles visuels personnalisés',
+                    '📱 Intégration Instagram : Connecter Instagram Business API, configurer Meta Business Manager, paramétrer les autorisations de publication et tester la connexion avec un post simple',
+                    '⚙️ Paramétrage du workflow : Configurer les déclencheurs (planification quotidienne/hebdomadaire), définir vos thématiques de contenu, paramétrer les templates de posts et créer la logique de génération automatique',
+                    '🎯 Personnalisation de la marque : Définir votre palette de couleurs, uploader vos logos et éléments graphiques, configurer les styles d\'images et paramétrer la tonalité de vos textes',
+                    '📊 Configuration analytique : Connecter les APIs d\'analyse Instagram, paramétrer le tracking des performances, définir les KPIs importants et configurer les rapports automatiques',
+                    '🧪 Tests et optimisation : Générer du contenu de test, valider la qualité des images/vidéos, tester les publications programmées et ajuster les paramètres selon les résultats',
+                    '🚀 Lancement et monitoring : Activer la génération automatique, configurer les notifications de contrôle qualité et mettre en place le système de monitoring des performances'
+                ]
+            }
+        ];
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBlueprints();
+            setupFilters();
+        });
+
+        // Load blueprints
+        async function loadBlueprints() {
+            try {
+                console.log('🔄 Loading blueprints from API...');
+                const response = await fetch('/api/blueprints');
+                const data = await response.json();
+
+                if (data.success && data.blueprints) {
+                    allBlueprints = data.blueprints;
+                    console.log('✅ Blueprints loaded:', allBlueprints.length);
+                } else {
+                    console.warn('⚠️ API response not successful, using sample data');
+                    allBlueprints = sampleBlueprints;
+                }
+
+                filteredBlueprints = [...allBlueprints];
+                renderBlueprints();
+            } catch (error) {
+                console.error('❌ Error loading blueprints from API:', error);
+                console.log('🔄 Fallback to sample data');
+                allBlueprints = sampleBlueprints;
+                filteredBlueprints = [...allBlueprints];
+                renderBlueprints();
+            }
+        }
+
+        // Setup filters
+        function setupFilters() {
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const priceFilter = document.getElementById('priceFilter');
+            const difficultyFilter = document.getElementById('difficultyFilter');
+
+            [searchInput, categoryFilter, priceFilter, difficultyFilter].forEach(element => {
+                element.addEventListener('change', filterBlueprints);
+                element.addEventListener('input', filterBlueprints);
+            });
+        }
+
+        // Filter blueprints
+        function filterBlueprints() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryValue = document.getElementById('categoryFilter').value;
+            const priceRange = document.getElementById('priceFilter').value;
+            const difficulty = document.getElementById('difficultyFilter').value;
+
+            filteredBlueprints = allBlueprints.filter(blueprint => {
+                const matchesSearch = !searchTerm ||
+                    blueprint.title.toLowerCase().includes(searchTerm) ||
+                    blueprint.description.toLowerCase().includes(searchTerm) ||
+                    blueprint.features.some(feature => feature.toLowerCase().includes(searchTerm));
+
+                const matchesCategory = !categoryValue || blueprint.category === categoryValue;
+
+                let matchesPrice = true;
+                if (priceRange) {
+                    const price = blueprint.price / 100;
+                    if (priceRange === '0-50') matchesPrice = price < 50;
+                    else if (priceRange === '50-100') matchesPrice = price >= 50 && price <= 100;
+                    else if (priceRange === '100+') matchesPrice = price > 100;
+                }
+
+                const matchesDifficulty = !difficulty || blueprint.difficulty_level === difficulty;
+
+                return matchesSearch && matchesCategory && matchesPrice && matchesDifficulty;
+            });
+
+            renderBlueprints();
+        }
+
+        // Render blueprints
+        function renderBlueprints() {
+            const grid = document.getElementById('blueprintsGrid');
+
+            if (filteredBlueprints.length === 0) {
+                grid.innerHTML = ''; // Clear
+                const emptyDiv = document.createElement('div');
+                emptyDiv.style.cssText = 'grid-column: 1/-1; text-align: center; padding: 3rem;';
+
+                const emptyTitle = SecurityUtils.createSafeElement('h3', 'Aucun blueprint trouvé');
+                const emptyText = SecurityUtils.createSafeElement('p', 'Essayez de modifier vos filtres de recherche.');
+
+                emptyDiv.appendChild(emptyTitle);
+                emptyDiv.appendChild(emptyText);
+                grid.appendChild(emptyDiv);
+                return;
+            }
+
+            // Utilisation de la fonction sécurisée pour créer chaque carte
+            grid.innerHTML = ''; // Clear
+            filteredBlueprints.forEach(blueprint => {
+                const card = SecurityUtils.createBlueprintCard(blueprint, formatPrice);
+                grid.appendChild(card);
+            });
+        }
+
+        // Open modal
+        function openModal(blueprintId) {
+            console.log('🔍 Opening modal for:', blueprintId);
+            console.log('📋 Available blueprints:', allBlueprints.map(b => b.id));
+            // Debug: openModal called
+
+            currentBlueprint = allBlueprints.find(b => b.id === blueprintId);
+            if (!currentBlueprint) {
+                console.error('❌ Blueprint not found:', blueprintId);
+                alert('Blueprint non trouvé: ' + blueprintId);
+                return;
+            }
+            console.log('✅ Blueprint found:', currentBlueprint.title);
+
+            // Populate modal content
+            document.getElementById('modalTitle').textContent = currentBlueprint.title;
+            // Description sécurisée
+            const modalDesc = document.getElementById('modalDescription');
+            modalDesc.innerHTML = ''; // Clear
+
+            const descP = SecurityUtils.createSafeElement('p', currentBlueprint.long_description, {'style': 'margin-bottom: 1rem;'});
+            modalDesc.appendChild(descP);
+
+            const metaDiv = SecurityUtils.createSafeElement('div', '', {'style': 'display: flex; gap: 2rem; margin-bottom: 1rem;'});
+            metaDiv.appendChild(SecurityUtils.createSafeElement('div', `Catégorie: ${currentBlueprint.category}`));
+            metaDiv.appendChild(SecurityUtils.createSafeElement('div', `Difficulté: ${currentBlueprint.difficulty_level}`));
+            metaDiv.appendChild(SecurityUtils.createSafeElement('div', `Temps d'installation: ${currentBlueprint.estimated_setup_time}`));
+            modalDesc.appendChild(metaDiv);
+
+            // Features sécurisées
+            const modalFeatures = document.getElementById('modalFeatures');
+            modalFeatures.innerHTML = ''; // Clear
+
+            const featuresTitle = SecurityUtils.createSafeElement('div', 'Toutes les fonctionnalités :', {
+                'class': 'features-title',
+                'style': 'margin-top: 1rem;'
+            });
+            modalFeatures.appendChild(featuresTitle);
+
+            const featuresList = SecurityUtils.createSafeList(currentBlueprint.features, 'ul', 'feature-list');
+            modalFeatures.appendChild(featuresList);
+
+            // Installation steps sécurisées
+            const modalInstallation = document.getElementById('modalInstallation');
+            modalInstallation.innerHTML = ''; // Clear
+
+            const installationList = SecurityUtils.createSafeList(currentBlueprint.installation_steps, 'ol', 'installation-steps');
+            modalInstallation.appendChild(installationList);
+
+            // Prerequisites sécurisées
+            const modalPrerequisites = document.getElementById('modalPrerequisites');
+            modalPrerequisites.innerHTML = ''; // Clear
+
+            const prerequisitesList = SecurityUtils.createSafeList(currentBlueprint.prerequisites, 'ul', 'feature-list');
+            modalPrerequisites.appendChild(prerequisitesList);
+
+            // S'assurer que le modal est affiché d'abord
+            document.getElementById('blueprintModal').classList.add('show');
+
+            // Attendre un petit délai pour que le DOM soit mis à jour
+            setTimeout(() => {
+                const modalPriceElement = document.getElementById('modalPrice');
+                if (modalPriceElement) {
+                    modalPriceElement.textContent = formatPrice(currentBlueprint.price);
+                } else {
+                    console.error('❌ Element modalPrice not found in DOM');
+                }
+            }, 100);
+
+            // Setup purchase button
+            const purchaseBtn = document.getElementById('purchaseBtn');
+            const downloadSection = document.getElementById('downloadSection');
+
+            if (!purchaseBtn) {
+                console.error('❌ Element purchaseBtn not found in DOM');
+                return;
+            }
+
+            if (purchases.has(blueprintId)) {
+                purchaseBtn.textContent = 'Déjà acheté ✓';
+                purchaseBtn.disabled = true;
+                if (downloadSection) downloadSection.classList.remove('locked');
+            } else {
+                purchaseBtn.textContent = `Acheter maintenant - ${formatPrice(currentBlueprint.price)}€`;
+                purchaseBtn.disabled = false;
+                purchaseBtn.onclick = () => purchaseBlueprint(blueprintId);
+                if (downloadSection) downloadSection.classList.add('locked');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('blueprintModal').classList.remove('show');
+            document.getElementById('purchaseStatus').style.display = 'none';
+            currentBlueprint = null;
+        }
+
+        // Purchase blueprint - redirect to Gumroad
+        function purchaseBlueprint(blueprintId) {
+            console.log('🛒 Starting purchase for:', blueprintId);
+
+            const blueprint = allBlueprints.find(b => b.id === blueprintId);
+            if (!blueprint) {
+                console.error('❌ Blueprint not found for purchase:', blueprintId);
+                alert('Blueprint non trouvé: ' + blueprintId);
+                return;
+            }
+
+            console.log('✅ Blueprint found for purchase:', blueprint.title);
+
+            // Check if Gumroad URL exists
+            if (!blueprint.gumroad_url) {
+                alert('❌ URL Gumroad manquante pour ce blueprint');
+                return;
+            }
+
+            // Redirect to Gumroad
+            console.log('🔄 Redirecting to Gumroad:', blueprint.gumroad_url);
+            window.open(blueprint.gumroad_url, '_blank');
+        }
+
+        // Go back function
+        function goBack() {
+            if (document.referrer && document.referrer !== window.location.href) {
+                window.history.back();
+            } else {
+                // Fallback to homepage
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Download blueprint
+        function downloadBlueprint(blueprintId) {
+            if (!purchases.has(blueprintId)) {
+                alert('Vous devez d\'abord acheter ce blueprint.');
+                return;
+            }
+
+            // Create sample JSON file for download
+            const blueprint = allBlueprints.find(b => b.id === blueprintId);
+            const sampleData = {
+                name: blueprint.name,
+                version: "1.0.0",
+                description: blueprint.description,
+                make_scenario: {
+                    modules: [
+                        {
+                            id: 1,
+                            name: "Webhook",
+                            type: "webhook",
+                            parameters: {
+                                url: "YOUR_WEBHOOK_URL"
+                            }
+                        },
+                        {
+                            id: 2,
+                            name: "Data Processing",
+                            type: "data_transformer",
+                            parameters: {
+                                mapping: "Custom mapping rules"
+                            }
+                        }
+                    ],
+                    connections: [
+                        { from: 1, to: 2 }
+                    ]
+                },
+                installation_guide: blueprint.installation_steps,
+                prerequisites: blueprint.prerequisites
+            };
+
+            // Create and download file
+            const dataStr = JSON.stringify(sampleData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+
+            const exportFileDefaultName = `${blueprint.name}-blueprint.json`;
+
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+
+            alert('Téléchargement commencé ! Le fichier JSON du blueprint va se télécharger.');
+        }
+
+        // Format price
+        function formatPrice(price) {
+            // Prices are already in euros from the API
+            return price;
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('blueprintModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Go back function
+        function goBack() {
+            if (document.referrer && document.referrer !== window.location.href) {
+                window.history.back();
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+
+
+
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Baptiste Zyed MEDDEB</h3>
+                    <p>Expert en automatisation des processus métier avec l'Intelligence Artificielle. Basé en Suisse.</p>
+                    <div style="margin-top: 1rem;">
+                        <a href="https://bento.me/bzmeddeb" target="_blank" style="display: block; margin-bottom: 0.5rem;">Mon profil complet >></a>
+                        <a href="https://www.linkedin.com/in/bzmeddeb/" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: #0077b5; border-radius: 8px; color: white; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#005885'" onmouseout="this.style.background='#0077b5'">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Services</h3>
+                    <a href="index.html#services">Audit Personnalisé</a>
+                    <a href="index.html#services">Programme Quick Win</a>
+                    <a href="index.html#services">Transformation Complète</a>
+                    <a href="https://calendar.app.google/vaCEdgHuR2Ffdrp3A" target="_blank">Consultation Gratuite</a>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Solutions</h3>
+                    <a href="index.html#calculator">Calculateur d'économies</a>
+                    <a href="marketplace.html">Blueprints Make.com</a>
+                    <a href="faq.html">FAQ</a>
+                    <p>Rédaction automatique</p>
+                    <p>Gestion des emails</p>
+                    <p>Workflows automatisés</p>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <a href="tel:+41793017915">+41 79 301 79 15</a>
+                    <a href="mailto:zyed.elmeddeb@gmail.com">zyed.elmeddeb@gmail.com</a>
+                    <p>Route du Manège 60, 1950 Sion</p>
+                </div>
+
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 Baptiste Zyed MEDDEB - Expert Automatisation IA. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

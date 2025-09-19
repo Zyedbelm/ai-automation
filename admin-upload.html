@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Upload Blueprint</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.8;
+        }
+
+        .upload-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+        }
+
+        .blueprint-selector {
+            margin-bottom: 2rem;
+        }
+
+        .blueprint-selector label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+        }
+
+        .blueprint-selector select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            color: #2d3748;
+        }
+
+        .blueprint-selector select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .file-upload {
+            margin-bottom: 2rem;
+        }
+
+        .file-upload label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            background: #f7fafc;
+            transition: all 0.3s ease;
+            min-height: 120px;
+        }
+
+        .file-input-display:hover,
+        .file-input-display.dragover {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .file-input-display.has-file {
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .file-info {
+            text-align: center;
+        }
+
+        .file-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .file-text {
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-top: 0.5rem;
+        }
+
+        .upload-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .upload-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .upload-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border-left: 4px solid #48bb78;
+        }
+
+        .message.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .message.info {
+            background: #bee3f8;
+            color: #2a69ac;
+            border-left: 4px solid #3182ce;
+        }
+
+        .blueprints-list {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .blueprint-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .blueprint-info h4 {
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .blueprint-info p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .blueprint-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-uploaded {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-pending {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .upload-section,
+            .blueprints-list {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔧 Admin Panel</h1>
+            <p>Upload et gestion des blueprints Make.com</p>
+        </header>
+
+        <div class="upload-section">
+            <h2 class="section-title">Upload d'un Blueprint</h2>
+
+            <div class="blueprint-selector">
+                <label for="blueprint-select">Sélectionnez le blueprint :</label>
+                <select id="blueprint-select" required>
+                    <option value="">-- Choisir un blueprint --</option>
+                    <option value="lead-generation-system">Système de Génération de Leads</option>
+                    <option value="social-media-automation">Automatisation Réseaux Sociaux</option>
+                </select>
+            </div>
+
+            <div class="file-upload">
+                <label>Fichier JSON du blueprint :</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="file-input" class="file-input" accept=".json" required>
+                    <div class="file-input-display" id="file-display">
+                        <div class="file-info">
+                            <span class="file-icon">📄</span>
+                            <div class="file-text">
+                                Cliquez pour sélectionner un fichier JSON<br>
+                                ou glissez-déposez le fichier ici
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-bar" id="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+
+            <button type="button" id="upload-button" class="upload-button" disabled>
+                Uploader le Blueprint
+            </button>
+
+            <div id="message-container"></div>
+        </div>
+
+        <div class="blueprints-list">
+            <h2 class="section-title">Blueprints Disponibles</h2>
+            <div id="blueprints-container">
+                <div class="blueprint-item">
+                    <div class="blueprint-info">
+                        <h4>Système de Génération de Leads</h4>
+                        <p>Blueprint pour automatiser la capture et qualification des prospects</p>
+                    </div>
+                    <span class="blueprint-status status-pending" id="status-lead-generation-system">
+                        Fichier manquant
+                    </span>
+                </div>
+
+                <div class="blueprint-item">
+                    <div class="blueprint-info">
+                        <h4>Automatisation Réseaux Sociaux</h4>
+                        <p>Publication et engagement automatisés sur les réseaux sociaux</p>
+                    </div>
+                    <span class="blueprint-status status-pending" id="status-social-media-automation">
+                        Fichier manquant
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001';
+
+        const fileInput = document.getElementById('file-input');
+        const fileDisplay = document.getElementById('file-display');
+        const blueprintSelect = document.getElementById('blueprint-select');
+        const uploadButton = document.getElementById('upload-button');
+        const progressBar = document.getElementById('progress-bar');
+        const progressFill = document.getElementById('progress-fill');
+        const messageContainer = document.getElementById('message-container');
+
+        let selectedFile = null;
+
+        // File input handling
+        fileInput.addEventListener('change', handleFileSelect);
+        blueprintSelect.addEventListener('change', updateUploadButton);
+
+        // Drag and drop handling
+        fileDisplay.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileDisplay.classList.add('dragover');
+        });
+
+        fileDisplay.addEventListener('dragleave', () => {
+            fileDisplay.classList.remove('dragover');
+        });
+
+        fileDisplay.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileDisplay.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type === 'application/json' || file.name.endsWith('.json')) {
+                    fileInput.files = files;
+                    handleFileSelect({ target: { files: [file] } });
+                } else {
+                    showMessage('Seuls les fichiers JSON sont acceptés.', 'error');
+                }
+            }
+        });
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                selectedFile = files[0];
+
+                // Validate JSON
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        JSON.parse(e.target.result);
+
+                        // Update display
+                        fileDisplay.classList.add('has-file');
+                        fileDisplay.innerHTML = `
+                            <div class="file-info">
+                                <span class="file-icon">✅</span>
+                                <div class="file-text">Fichier JSON valide</div>
+                                <div class="file-name">${selectedFile.name}</div>
+                                <div style="color: #718096; font-size: 0.8rem; margin-top: 0.25rem;">
+                                    ${formatFileSize(selectedFile.size)}
+                                </div>
+                            </div>
+                        `;
+
+                        updateUploadButton();
+                        clearMessages();
+
+                    } catch (error) {
+                        showMessage('Le fichier JSON n\'est pas valide.', 'error');
+                        resetFileInput();
+                    }
+                };
+                reader.readAsText(selectedFile);
+            } else {
+                resetFileInput();
+            }
+        }
+
+        function updateUploadButton() {
+            const blueprintId = blueprintSelect.value;
+            const hasFile = selectedFile !== null;
+
+            uploadButton.disabled = !(blueprintId && hasFile);
+
+            if (uploadButton.disabled) {
+                uploadButton.textContent = 'Sélectionnez un blueprint et un fichier';
+            } else {
+                uploadButton.textContent = 'Uploader le Blueprint';
+            }
+        }
+
+        function resetFileInput() {
+            selectedFile = null;
+            fileDisplay.classList.remove('has-file');
+            fileDisplay.innerHTML = `
+                <div class="file-info">
+                    <span class="file-icon">📄</span>
+                    <div class="file-text">
+                        Cliquez pour sélectionner un fichier JSON<br>
+                        ou glissez-déposez le fichier ici
+                    </div>
+                </div>
+            `;
+            updateUploadButton();
+        }
+
+        // Upload functionality
+        uploadButton.addEventListener('click', async () => {
+            const blueprintId = blueprintSelect.value;
+
+            if (!blueprintId || !selectedFile) {
+                showMessage('Veuillez sélectionner un blueprint et un fichier.', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('blueprint', selectedFile);
+
+            // Show progress
+            uploadButton.disabled = true;
+            uploadButton.textContent = 'Upload en cours...';
+            progressBar.classList.add('active');
+
+            try {
+                const response = await fetch(`${API_URL}/admin/upload-blueprint/${blueprintId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                // Simulate progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 10;
+                    progressFill.style.width = progress + '%';
+
+                    if (progress >= 90) {
+                        clearInterval(progressInterval);
+                    }
+                }, 100);
+
+                const result = await response.json();
+
+                // Complete progress
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+
+                if (result.success) {
+                    showMessage('Blueprint uploadé avec succès !', 'success');
+                    updateBlueprintStatus(blueprintId, 'uploaded');
+
+                    // Reset form
+                    setTimeout(() => {
+                        resetForm();
+                    }, 2000);
+                } else {
+                    throw new Error(result.error || 'Erreur lors de l\'upload');
+                }
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showMessage('Erreur lors de l\'upload : ' + error.message, 'error');
+            } finally {
+                // Reset UI
+                setTimeout(() => {
+                    uploadButton.disabled = false;
+                    uploadButton.textContent = 'Uploader le Blueprint';
+                    progressBar.classList.remove('active');
+                    progressFill.style.width = '0%';
+                }, 1000);
+            }
+        });
+
+        function resetForm() {
+            blueprintSelect.value = '';
+            resetFileInput();
+            clearMessages();
+        }
+
+        function updateBlueprintStatus(blueprintId, status) {
+            const statusElement = document.getElementById(`status-${blueprintId}`);
+            if (statusElement) {
+                if (status === 'uploaded') {
+                    statusElement.textContent = 'Fichier disponible ✓';
+                    statusElement.className = 'blueprint-status status-uploaded';
+                } else {
+                    statusElement.textContent = 'Fichier manquant';
+                    statusElement.className = 'blueprint-status status-pending';
+                }
+            }
+        }
+
+        function showMessage(text, type) {
+            clearMessages();
+
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.textContent = text;
+
+            messageContainer.appendChild(message);
+
+            // Auto-hide success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    message.remove();
+                }, 5000);
+            }
+        }
+
+        function clearMessages() {
+            messageContainer.innerHTML = '';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Check current blueprint status on page load
+        async function checkBlueprintStatus() {
+            try {
+                const response = await fetch(`${API_URL}/api/blueprints`);
+                const result = await response.json();
+
+                if (result.success) {
+                    result.data.forEach(blueprint => {
+                        const hasFile = blueprint.file_url !== null;
+                        updateBlueprintStatus(blueprint.id, hasFile ? 'uploaded' : 'pending');
+                    });
+                }
+            } catch (error) {
+                console.warn('Could not check blueprint status:', error);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkBlueprintStatus();
+        });
+    </script>
+</body>
+</html>

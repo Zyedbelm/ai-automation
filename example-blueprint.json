@@ -1,0 +1,497 @@
+{
+  "name": "Système de Génération de Leads Avancé",
+  "description": "Blueprint Make.com pour automatiser complètement votre processus de génération et qualification de leads",
+  "version": "2.1.0",
+  "author": "Blueprint Store",
+  "category": "Lead Generation & CRM",
+  "created": "2024-09-14T10:00:00Z",
+  "updated": "2024-09-14T12:00:00Z",
+  "difficulty": "Intermédiaire",
+  "estimated_setup_time": "45-60 minutes",
+  "prerequisites": {
+    "make_plan": "Pro ou supérieur recommandé",
+    "integrations": [
+      "HubSpot CRM",
+      "Google Sheets",
+      "Mailchimp ou ActiveCampaign",
+      "Slack (optionnel)",
+      "Zapier Webhooks"
+    ],
+    "technical_knowledge": "Basique - Interface graphique Make.com"
+  },
+  "features": [
+    "Capture automatique de leads depuis formulaires web",
+    "Qualification par scoring intelligent",
+    "Enrichissement automatique des données",
+    "Séquences email personnalisées",
+    "Notifications temps réel",
+    "Rapports automatisés",
+    "Gestion des doublons",
+    "Attribution de leads par territoire"
+  ],
+  "modules": [
+    {
+      "id": "webhook-capture",
+      "type": "webhook",
+      "name": "Récepteur de Leads",
+      "description": "Point d'entrée pour capturer les leads depuis vos formulaires",
+      "config": {
+        "method": "POST",
+        "path": "/webhook/lead-capture",
+        "headers": {
+          "content-type": "application/json"
+        }
+      },
+      "expected_data": {
+        "email": "string (requis)",
+        "firstName": "string",
+        "lastName": "string",
+        "company": "string",
+        "phone": "string",
+        "source": "string",
+        "campaign": "string"
+      }
+    },
+    {
+      "id": "data-validator",
+      "type": "filter",
+      "name": "Validation des Données",
+      "description": "Valide et nettoie les données entrantes",
+      "config": {
+        "filters": [
+          {
+            "field": "email",
+            "condition": "matches",
+            "value": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+          },
+          {
+            "field": "firstName",
+            "condition": "not_empty"
+          }
+        ]
+      }
+    },
+    {
+      "id": "duplicate-checker",
+      "type": "http",
+      "name": "Vérification des Doublons",
+      "description": "Vérifie si le lead existe déjà dans le CRM",
+      "config": {
+        "url": "https://api.hubspot.com/crm/v3/objects/contacts/search",
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer {{hubspot_token}}",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "filterGroups": [
+            {
+              "filters": [
+                {
+                  "propertyName": "email",
+                  "operator": "EQ",
+                  "value": "{{email}}"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lead-scorer",
+      "type": "function",
+      "name": "Calculateur de Score",
+      "description": "Attribue un score au lead basé sur différents critères",
+      "config": {
+        "scoring_rules": [
+          {
+            "condition": "company != null",
+            "points": 20
+          },
+          {
+            "condition": "phone != null",
+            "points": 15
+          },
+          {
+            "condition": "source == 'website'",
+            "points": 10
+          },
+          {
+            "condition": "source == 'social'",
+            "points": 5
+          },
+          {
+            "condition": "email.includes('gmail.com')",
+            "points": -5
+          },
+          {
+            "condition": "email.includes('company-domain.com')",
+            "points": 25
+          }
+        ]
+      }
+    },
+    {
+      "id": "data-enricher",
+      "type": "http",
+      "name": "Enrichissement des Données",
+      "description": "Enrichit le profil avec des données externes",
+      "config": {
+        "services": [
+          {
+            "name": "Clearbit",
+            "url": "https://person.clearbit.com/v2/combined/find",
+            "params": {
+              "email": "{{email}}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "crm-creator",
+      "type": "http",
+      "name": "Création Contact CRM",
+      "description": "Crée ou met à jour le contact dans HubSpot",
+      "config": {
+        "url": "https://api.hubspot.com/crm/v3/objects/contacts",
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer {{hubspot_token}}",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "properties": {
+            "email": "{{email}}",
+            "firstname": "{{firstName}}",
+            "lastname": "{{lastName}}",
+            "company": "{{company}}",
+            "phone": "{{phone}}",
+            "lead_source": "{{source}}",
+            "lead_score": "{{score}}",
+            "lifecyclestage": "{{#if (gt score 50)}}marketingqualifiedlead{{else}}lead{{/if}}"
+          }
+        }
+      }
+    },
+    {
+      "id": "territory-router",
+      "type": "router",
+      "name": "Attribution Territoriale",
+      "description": "Attribue le lead au bon commercial selon le territoire",
+      "config": {
+        "routes": [
+          {
+            "condition": "company.location.includes('Paris')",
+            "assignee": "commercial-paris@company.com"
+          },
+          {
+            "condition": "company.location.includes('Lyon')",
+            "assignee": "commercial-lyon@company.com"
+          },
+          {
+            "condition": "score > 70",
+            "assignee": "senior-sales@company.com"
+          }
+        ],
+        "default_assignee": "leads@company.com"
+      }
+    },
+    {
+      "id": "email-trigger",
+      "type": "email",
+      "name": "Email de Bienvenue",
+      "description": "Déclenche la séquence email appropriée",
+      "config": {
+        "sequences": [
+          {
+            "condition": "score > 70",
+            "template": "high-value-lead-sequence",
+            "delay": "immediate"
+          },
+          {
+            "condition": "score > 30",
+            "template": "standard-nurturing-sequence",
+            "delay": "1h"
+          },
+          {
+            "condition": "score <= 30",
+            "template": "educational-sequence",
+            "delay": "4h"
+          }
+        ]
+      }
+    },
+    {
+      "id": "slack-notifier",
+      "type": "webhook",
+      "name": "Notification Slack",
+      "description": "Notifie l'équipe des nouveaux leads qualifiés",
+      "config": {
+        "url": "{{slack_webhook_url}}",
+        "method": "POST",
+        "condition": "score > 50",
+        "body": {
+          "text": "🎯 Nouveau lead qualifié !",
+          "attachments": [
+            {
+              "color": "good",
+              "fields": [
+                {
+                  "title": "Contact",
+                  "value": "{{firstName}} {{lastName}} ({{email}})"
+                },
+                {
+                  "title": "Entreprise",
+                  "value": "{{company}}"
+                },
+                {
+                  "title": "Score",
+                  "value": "{{score}}/100"
+                },
+                {
+                  "title": "Source",
+                  "value": "{{source}}"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "analytics-tracker",
+      "type": "http",
+      "name": "Suivi Analytics",
+      "description": "Enregistre les métriques dans Google Sheets pour reporting",
+      "config": {
+        "spreadsheet_id": "{{analytics_sheet_id}}",
+        "sheet_name": "Leads Tracking",
+        "data": {
+          "timestamp": "{{current_time}}",
+          "email": "{{email}}",
+          "source": "{{source}}",
+          "campaign": "{{campaign}}",
+          "score": "{{score}}",
+          "status": "new_lead"
+        }
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "webhook-capture",
+      "to": "data-validator",
+      "condition": "always"
+    },
+    {
+      "from": "data-validator",
+      "to": "duplicate-checker",
+      "condition": "validation_passed"
+    },
+    {
+      "from": "duplicate-checker",
+      "to": "lead-scorer",
+      "condition": "not_duplicate"
+    },
+    {
+      "from": "duplicate-checker",
+      "to": "crm-creator",
+      "condition": "is_duplicate",
+      "note": "Update existing contact"
+    },
+    {
+      "from": "lead-scorer",
+      "to": "data-enricher",
+      "condition": "score > 30"
+    },
+    {
+      "from": "data-enricher",
+      "to": "crm-creator",
+      "condition": "always"
+    },
+    {
+      "from": "crm-creator",
+      "to": "territory-router",
+      "condition": "contact_created"
+    },
+    {
+      "from": "territory-router",
+      "to": "email-trigger",
+      "condition": "always"
+    },
+    {
+      "from": "territory-router",
+      "to": "slack-notifier",
+      "condition": "score > 50"
+    },
+    {
+      "from": "crm-creator",
+      "to": "analytics-tracker",
+      "condition": "always"
+    }
+  ],
+  "error_handling": {
+    "global_settings": {
+      "max_retries": 3,
+      "retry_delay": "5s",
+      "timeout": "30s",
+      "on_error": "continue"
+    },
+    "module_specific": {
+      "crm-creator": {
+        "on_error": "stop_scenario",
+        "notification": "admin@company.com"
+      },
+      "email-trigger": {
+        "on_error": "log_and_continue"
+      }
+    }
+  },
+  "variables": [
+    {
+      "name": "hubspot_token",
+      "type": "secret",
+      "description": "Token d'API HubSpot"
+    },
+    {
+      "name": "slack_webhook_url",
+      "type": "secret",
+      "description": "URL du webhook Slack"
+    },
+    {
+      "name": "analytics_sheet_id",
+      "type": "string",
+      "description": "ID de la feuille Google Sheets pour analytics"
+    },
+    {
+      "name": "company_domain",
+      "type": "string",
+      "description": "Domaine de votre entreprise pour le scoring"
+    }
+  ],
+  "setup_instructions": [
+    {
+      "step": 1,
+      "title": "Prérequis et préparation",
+      "description": "Vérification des comptes et APIs nécessaires",
+      "tasks": [
+        "Vérifier que vous avez un compte Make.com Pro ou supérieur",
+        "Créer un token API HubSpot avec les permissions contacts",
+        "Configurer un webhook Slack (optionnel)",
+        "Préparer une feuille Google Sheets pour les analytics",
+        "Noter les domaines de votre entreprise pour le scoring"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Import du blueprint",
+      "description": "Installation du blueprint dans Make.com",
+      "tasks": [
+        "Se connecter à Make.com",
+        "Cliquer sur 'Create a new scenario'",
+        "Sélectionner 'Import Blueprint'",
+        "Uploader le fichier JSON téléchargé",
+        "Confirmer l'import"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Configuration des connexions",
+      "description": "Paramétrage des intégrations externes",
+      "tasks": [
+        "Configurer la connexion HubSpot avec votre token API",
+        "Tester la connexion HubSpot",
+        "Configurer Google Sheets si utilisé pour analytics",
+        "Paramétrer Slack webhook si désiré",
+        "Tester toutes les connexions"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Personnalisation des règles",
+      "description": "Adaptation du blueprint à vos besoins",
+      "tasks": [
+        "Ajuster les règles de scoring dans le module 'lead-scorer'",
+        "Configurer les territoires dans 'territory-router'",
+        "Personnaliser les templates email",
+        "Définir vos critères de qualification",
+        "Adapter les notifications Slack"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Tests et validation",
+      "description": "Vérification du bon fonctionnement",
+      "tasks": [
+        "Effectuer un test avec des données fictives",
+        "Vérifier la création du contact dans HubSpot",
+        "Tester l'envoi des emails",
+        "Contrôler les notifications Slack",
+        "Valider l'enregistrement analytics"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Mise en production",
+      "description": "Activation du système en live",
+      "tasks": [
+        "Copier l'URL du webhook depuis Make.com",
+        "Configurer vos formulaires web pour envoyer vers ce webhook",
+        "Activer le scénario Make.com",
+        "Configurer les alertes d'erreur",
+        "Documenter la configuration pour votre équipe"
+      ]
+    }
+  ],
+  "troubleshooting": [
+    {
+      "issue": "Les leads ne sont pas créés dans HubSpot",
+      "solutions": [
+        "Vérifier le token API HubSpot",
+        "Contrôler les permissions du token (lecture/écriture contacts)",
+        "Vérifier que l'email est au bon format",
+        "Tester manuellement l'API HubSpot"
+      ]
+    },
+    {
+      "issue": "Les emails ne sont pas envoyés",
+      "solutions": [
+        "Vérifier la connexion à votre outil email marketing",
+        "Contrôler que les templates existent",
+        "Vérifier les conditions de déclenchement",
+        "Tester avec un email différent"
+      ]
+    },
+    {
+      "issue": "Notifications Slack non reçues",
+      "solutions": [
+        "Vérifier l'URL du webhook Slack",
+        "Tester le webhook manuellement",
+        "Contrôler les conditions de score",
+        "Vérifier les permissions du bot Slack"
+      ]
+    }
+  ],
+  "best_practices": [
+    "Commencez par tester avec un petit volume de leads",
+    "Surveillez les logs Make.com les premiers jours",
+    "Ajustez progressivement les règles de scoring",
+    "Documentez vos personnalisations",
+    "Créez des sauvegardes de votre configuration",
+    "Formez votre équipe commerciale sur le nouveau processus"
+  ],
+  "performance_metrics": {
+    "execution_time": "2-5 seconds per lead",
+    "success_rate": "99.5%",
+    "max_throughput": "1000 leads/hour",
+    "resource_usage": "Low (2-3 operations per lead)"
+  },
+  "support": {
+    "documentation": "https://blueprint-store.com/docs/lead-generation",
+    "video_tutorial": "https://blueprint-store.com/tutorials/lead-generation",
+    "support_email": "support@blueprint-store.com",
+    "community_forum": "https://community.blueprint-store.com"
+  }
+}

@@ -3,11 +3,15 @@
 .env.local
 .env.production
 
-# Dossier Supabase (code source Edge Functions - local seulement)
-supabase/
+# Dossier Supabase config local uniquement (garder les Edge Functions)
+supabase/config.toml
+supabase/.temp/
 
 # Logs
 *.log
+logs/
+pm2.log
+pm2-error.log
 
 # Dependencies
 node_modules/

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration Blueprints - BZM</title>
+
+    <!-- Security Utils -->
+    <script src="security-utils.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1a202c;
+        }
+
+        .admin-header {
+            background: #2d3748;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .admin-content {
+            padding: 2rem 0;
+        }
+
+        .admin-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B00, #FF4500);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #FF4500, #FF2D00);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .blueprints-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .blueprint-item {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .blueprint-info h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .blueprint-info p {
+            color: #718096;
+            font-size: 0.875rem;
+        }
+
+        .blueprint-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            border-bottom-color: #FF6B00;
+            color: #FF6B00;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #FF6B00;
+        }
+
+        .stat-label {
+            color: #718096;
+            margin-top: 0.5rem;
+        }
+
+        .success-message {
+            background: #c6f6d5;
+            border: 1px solid #9ae6b4;
+            color: #22543d;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .error-message {
+            background: #fed7d7;
+            border: 1px solid #feb2b2;
+            color: #742a2a;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="admin-header">
+        <div class="container">
+            <nav class="admin-nav">
+                <h1 class="admin-title">🚀 Administration Blueprints</h1>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <a href="index.html" class="btn btn-secondary">← Retour au site</a>
+                    <button onclick="logout()" class="btn btn-danger">🔓 Déconnexion</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="admin-content">
+        <div class="container">
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalBlueprints">3</div>
+                    <div class="stat-label">Blueprints actifs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSales">47</div>
+                    <div class="stat-label">Ventes totales</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalRevenue">3,247€</div>
+                    <div class="stat-label">Revenus générés</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('blueprints', event)">Gérer les Blueprints</div>
+                <div class="tab" onclick="switchTab('add', event)">Ajouter Blueprint</div>
+                <div class="tab" onclick="switchTab('settings', event)">Paramètres</div>
+            </div>
+
+            <!-- Messages -->
+            <div id="successMessage" class="success-message"></div>
+            <div id="errorMessage" class="error-message"></div>
+
+            <!-- Tab: Manage Blueprints -->
+            <div id="blueprintsTab" class="tab-content active">
+                <div class="admin-card">
+                    <h2 class="card-title">📋 Blueprints existants</h2>
+                    <div class="blueprints-list" id="blueprintsList">
+                        <!-- Blueprints will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Add Blueprint -->
+            <div id="addTab" class="tab-content">
+                <div class="admin-card">
+                    <h2 class="card-title">➕ Ajouter un nouveau Blueprint</h2>
+                    <form id="addBlueprintForm">
+                        <div class="form-group">
+                            <label for="blueprintName">Nom technique</label>
+                            <input type="text" id="blueprintName" name="name" required placeholder="ex: lead-generation-advanced">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="blueprintTitle">Titre affiché</label>
+                            <input type="text" id="blueprintTitle" name="title" required placeholder="ex: Système de Génération de Leads Avancé">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="blueprintDescription">Description courte</label>
+                            <textarea id="blueprintDescription" name="description" required placeholder="Description qui apparaît sur les cartes..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="blueprintLongDescription">Description détaillée <span style="color: #e53e3e;">*</span></label>
+                            <textarea id="blueprintLongDescription" name="longDescription" required placeholder="Description complète qui s'affiche dans la popup de détails..." style="min-height: 120px;"></textarea>
+                            <small style="color: #718096; font-size: 0.875rem;">Cette description s'affiche quand on clique sur "Voir détails"</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="blueprintPrice">Prix (en centimes)</label>
+                            <input type="number" id="blueprintPrice" name="price" required placeholder="ex: 9700 pour 97€">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="blueprintCategory">Catégorie</label>
+                            <select id="blueprintCategory" name="category" required>
+                                <option value="">Choisir une catégorie</option>
+                                <option value="Lead Generation">Lead Generation</option>
+                                <option value="Social Media">Social Media</option>
+                                <option value="E-commerce">E-commerce</option>
+                                <option value="CRM & Sales">CRM & Sales</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Analytics">Analytics</option>
+                                <option value="Customer Support">Customer Support</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="blueprintDifficulty">Niveau de difficulté</label>
+                            <select id="blueprintDifficulty" name="difficulty" required>
+                                <option value="">Choisir le niveau</option>
+                                <option value="Débutant">Débutant</option>
+                                <option value="Intermédiaire">Intermédiaire</option>
+                                <option value="Avancé">Avancé</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="blueprintSetupTime">Temps d'installation</label>
+                            <input type="text" id="blueprintSetupTime" name="setupTime" required placeholder="ex: 30-45 minutes">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="blueprintFeatures">Fonctionnalités (une par ligne)</label>
+                            <textarea id="blueprintFeatures" name="features" required placeholder="Capture automatique des leads&#10;Qualification intelligente&#10;..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="blueprintPrerequisites">Prérequis (un par ligne)</label>
+                            <textarea id="blueprintPrerequisites" name="prerequisites" required placeholder="Compte Make.com Pro&#10;CRM (HubSpot/Salesforce)&#10;..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="blueprintSteps">Étapes d'installation (une par ligne)</label>
+                            <textarea id="blueprintSteps" name="steps" required placeholder="Vérification des comptes et APIs nécessaires&#10;Import du blueprint dans Make.com&#10;..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="blueprintGumroadUrl">URL Gumroad <span style="color: #e53e3e;">*</span></label>
+                            <input type="url" id="blueprintGumroadUrl" name="gumroad_url" required placeholder="https://gumroad.com/l/your-product-link">
+                            <small style="color: #718096; font-size: 0.875rem;">Lien direct vers le produit Gumroad pour l'achat</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">💾 Enregistrer le Blueprint</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab: Settings -->
+            <div id="settingsTab" class="tab-content">
+                <div class="admin-card">
+                    <h2 class="card-title">⚙️ Paramètres généraux</h2>
+
+                    <div class="form-group">
+                        <label>URL de l'API</label>
+                        <input type="text" value="http://localhost:3001" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Base de données</label>
+                        <input type="text" value="Supabase (non connecté)" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Paiements</label>
+                        <input type="text" value="Gumroad (redirections)" disabled>
+                    </div>
+
+                    <button class="btn btn-secondary">🔄 Synchroniser avec Supabase</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // JWT Token Management
+        let jwtToken = sessionStorage.getItem('jwtToken');
+
+        // Check JWT authentication on page load
+        async function checkAuthentication() {
+            const token = sessionStorage.getItem('jwtToken');
+
+            if (!token) {
+                window.location.href = 'admin-login.html';
+                return false;
+            }
+
+            try {
+                const response = await fetch('/api/auth/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    sessionStorage.removeItem('jwtToken');
+                    window.location.href = 'admin-login.html';
+                    return false;
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Erreur vérification token:', error);
+                sessionStorage.removeItem('jwtToken');
+                window.location.href = 'admin-login.html';
+                return false;
+            }
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                sessionStorage.removeItem('jwtToken');
+                window.location.href = 'admin-login.html';
+            }
+        }
+
+        // Check authentication immediately
+        checkAuthentication().then(isValid => {
+            if (!isValid) {
+                // Redirection will happen automatically
+                return;
+            }
+            // Continue with page initialization
+            jwtToken = sessionStorage.getItem('jwtToken');
+        });
+
+        // Blueprints loaded from API
+        let blueprints = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBlueprints();
+            setupForm();
+        });
+
+        // Tab switching
+        function switchTab(tabName, event = null) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.add('active');
+
+            // Activate the correct tab button
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // Find and activate the tab button programmatically
+                const tabButton = document.querySelector(`.tab[onclick*="${tabName}"]`);
+                if (tabButton) {
+                    tabButton.classList.add('active');
+                }
+            }
+        }
+
+        // Load blueprints list from API
+        async function loadBlueprints() {
+            try {
+                console.log('🔄 Loading blueprints from API...');
+                const response = await fetch('/api/blueprints');
+                const data = await response.json();
+
+                if (data.success && data.blueprints) {
+                    blueprints = data.blueprints;
+                    console.log('✅ Blueprints loaded:', blueprints.length);
+                    renderBlueprints();
+                    updateStats();
+                } else {
+                    console.error('❌ Failed to load blueprints:', data);
+                    showError('Erreur lors du chargement des blueprints');
+                }
+            } catch (error) {
+                console.error('❌ Error loading blueprints:', error);
+                showError('Erreur de connexion à l\'API');
+            }
+        }
+
+        // Render blueprints list
+        function renderBlueprints() {
+            const container = document.getElementById('blueprintsList');
+
+            // Utilisation sécurisée pour créer les éléments
+            container.innerHTML = ''; // Clear
+
+            blueprints.forEach(blueprint => {
+                const item = document.createElement('div');
+                item.className = 'blueprint-item';
+
+                const info = document.createElement('div');
+                info.className = 'blueprint-info';
+
+                const title = SecurityUtils.createSafeElement('h4', blueprint.title);
+                const meta = SecurityUtils.createSafeElement('p', `${blueprint.category} • ${blueprint.price}€ • ${blueprint.difficulty_level}`);
+                const url = SecurityUtils.createSafeElement('small', `🔗 ${blueprint.gumroad_url || 'URL Gumroad non définie'}`, {
+                    'style': 'color: #718096;'
+                });
+
+                info.appendChild(title);
+                info.appendChild(meta);
+                info.appendChild(url);
+
+                const actions = document.createElement('div');
+                actions.className = 'blueprint-actions';
+
+                const editBtn = SecurityUtils.createSafeElement('button', '✏️ Modifier', {
+                    'class': 'btn btn-secondary'
+                });
+                editBtn.onclick = () => editBlueprint(blueprint.id);
+
+                const deleteBtn = SecurityUtils.createSafeElement('button', '🗑️ Supprimer', {
+                    'class': 'btn btn-danger'
+                });
+                deleteBtn.onclick = () => deleteBlueprint(blueprint.id);
+
+                actions.appendChild(editBtn);
+                actions.appendChild(deleteBtn);
+
+                item.appendChild(info);
+                item.appendChild(actions);
+                container.appendChild(item);
+            });
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.querySelector('.stat-card:first-child .stat-number').textContent = blueprints.length;
+
+            const avgPrice = blueprints.reduce((sum, bp) => sum + bp.price, 0) / blueprints.length;
+            document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = Math.round(avgPrice) + '€';
+
+            const categories = [...new Set(blueprints.map(bp => bp.category))];
+            document.querySelector('.stat-card:nth-child(3) .stat-number').textContent = categories.length;
+        }
+
+        // Setup form
+        function setupForm() {
+            document.getElementById('addBlueprintForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addBlueprint();
+            });
+        }
+
+        // Add or update blueprint - API call sécurisé
+        async function addBlueprint() {
+            if (!jwtToken) {
+                alert('Authentification requise');
+                logout();
+                return;
+            }
+
+            const formData = new FormData(document.getElementById('addBlueprintForm'));
+            const submitBtn = document.querySelector('#addBlueprintForm button[type="submit"]');
+            const editingId = submitBtn.getAttribute('data-editing');
+
+            const blueprintData = {
+                name: formData.get('name'),
+                title: formData.get('title'),
+                description: formData.get('description'),
+                long_description: formData.get('longDescription'),
+                price: parseInt(formData.get('price')),
+                category: formData.get('category'),
+                difficulty_level: formData.get('difficulty'),
+                estimated_setup_time: formData.get('setupTime'),
+                features: formData.get('features').split('\n').filter(f => f.trim()),
+                prerequisites: formData.get('prerequisites').split('\n').filter(p => p.trim()),
+                installation_steps: formData.get('steps').split('\n').filter(s => s.trim()),
+                gumroad_url: formData.get('gumroad_url')
+            };
+
+            // Validation côté client
+            const validation = SecurityUtils.validateBlueprint(blueprintData);
+            if (!validation.isValid) {
+                alert('Erreurs de validation:\n' + validation.errors.join('\n'));
+                return;
+            }
+
+            try {
+                let response;
+                if (editingId) {
+                    // Update existing blueprint
+                    response = await fetch(`/api/admin/blueprints/${editingId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${jwtToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(validation.blueprint)
+                    });
+                } else {
+                    // Add new blueprint
+                    response = await fetch('/api/admin/blueprints', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${jwtToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(validation.blueprint)
+                    });
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage(editingId ? 'Blueprint modifié avec succès !' : 'Blueprint ajouté avec succès !', 'success');
+                    loadBlueprints(); // Recharger depuis l'API
+                    document.getElementById('addBlueprintForm').reset();
+
+                    // Reset button state
+                    submitBtn.textContent = '💾 Enregistrer le Blueprint';
+                    submitBtn.removeAttribute('data-editing');
+
+                    // Switch back to blueprints tab
+                    switchTab('blueprints');
+                } else {
+                    showMessage('Erreur: ' + result.error, 'error');
+                    if (response.status === 401) {
+                        alert('Session expirée. Reconnexion requise.');
+                        logout();
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error saving blueprint:', error);
+                showMessage('Erreur de connexion à l\'API', 'error');
+            }
+        }
+
+        // Edit blueprint
+        function editBlueprint(id) {
+            const blueprint = blueprints.find(b => b.id === id);
+            if (!blueprint) return;
+
+            // Switch to add tab and populate form
+            switchTab('add');
+            switchTab('add');
+
+            // Populate form fields
+            document.getElementById('blueprintName').value = blueprint.name;
+            document.getElementById('blueprintTitle').value = blueprint.title;
+            document.getElementById('blueprintDescription').value = blueprint.description;
+            document.getElementById('blueprintLongDescription').value = blueprint.long_description;
+            document.getElementById('blueprintPrice').value = blueprint.price;
+            document.getElementById('blueprintCategory').value = blueprint.category;
+            document.getElementById('blueprintDifficulty').value = blueprint.difficulty_level;
+            document.getElementById('blueprintSetupTime').value = blueprint.estimated_setup_time;
+            document.getElementById('blueprintFeatures').value = blueprint.features.join('\n');
+            document.getElementById('blueprintPrerequisites').value = blueprint.prerequisites.join('\n');
+            document.getElementById('blueprintSteps').value = blueprint.installation_steps.join('\n');
+            document.getElementById('blueprintGumroadUrl').value = blueprint.gumroad_url || '';
+
+            // Change button text for editing mode
+            const submitBtn = document.querySelector('#addBlueprintForm button[type="submit"]');
+            submitBtn.textContent = '✏️ Modifier le Blueprint';
+            submitBtn.setAttribute('data-editing', blueprint.id);
+        }
+
+        // Delete blueprint - API call sécurisé
+        async function deleteBlueprint(id) {
+            if (!jwtToken) {
+                alert('Authentification requise');
+                logout();
+                return;
+            }
+
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce blueprint ?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/blueprints/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('Blueprint supprimé avec succès !', 'success');
+                    loadBlueprints(); // Recharger depuis l'API
+                } else {
+                    showMessage('Erreur: ' + result.error, 'error');
+                    if (response.status === 401) {
+                        alert('Session expirée. Reconnexion requise.');
+                        logout();
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error deleting blueprint:', error);
+                showMessage('Erreur de connexion à l\'API', 'error');
+            }
+        }
+
+        // Utility functions
+        function generateId() {
+            return 'blueprint-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function formatPrice(price) {
+            // Prices are already in euros from the API
+            return price;
+        }
+
+        function showError(message) {
+            showMessage(message, 'error');
+        }
+
+        function showSuccess(message) {
+            showMessage(message, 'success');
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById(type + 'Message');
+            messageDiv.textContent = message;
+            messageDiv.style.display = 'block';
+
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
